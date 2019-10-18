@@ -1,8 +1,20 @@
 # Subtitle
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/subtitle`. To experiment with that code, run `bin/console` for an interactive prompt.
+Welcome to `subtitle` gem!. Following functionality is provided using AWS services.
 
-TODO: Delete this and the text above, and describe your gem
+* Detect the Language code for the given Subtitle file
+* Translates the given subtitle file to required suggested language.
+
+Supports following subtitle files
+
+* SubRip (.srt)
+* WebVTT (.vtt) 
+
+## Prerequisite 
+Need access to following AWS services.
+
+* Comprehend
+* Translate
 
 ## Installation
 
@@ -14,7 +26,7 @@ gem 'subtitle'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -22,7 +34,45 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+## Detect Language
+```ruby
+require 'subtitle'
+
+subtitle = Subtitle.new(<aws_key>, <aws_secret>, <cc_file>)
+subtitle.detect_language
+
+<aws_key>     : AWS Key
+<aws_secret>  : AWS Secret
+<cc_file>     : Closed Caption File
+```
+
+## Translate Closed caption file to desired langauge
+```ruby
+require 'subtitle'
+
+subtitle = Subtitle.new(<aws_key>, <aws_secret>, <cc_file>)
+
+<aws_key>     : AWS Key
+<aws_secret>  : AWS Secret
+<cc_file>     : Closed Caption File
+
+Option 1
+
+subtitle.translate_cc(<dest_lang>, <src_lang> ,<outfile>)
+
+Option 2
+
+subtitle.translate_cc(<dest_lang>, <src_lang>)
+
+Option 3
+
+subtitle.translate_cc(<dest_lang>)
+
+<dest_lang>   : Provide translate Language code (ISO639 2 Letter Code)
+<src_lang>    : Provide  source Language code (ISO639 2 Letter Code). If not supplied, the source language will be auto detected.
+<outfile>     : Destination for translated closed caption file.
+```
+
 
 ## Development
 
@@ -32,7 +82,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/subtitle. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/pgmaheshwaran/subtitle. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
