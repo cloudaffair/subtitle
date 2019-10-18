@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "subtitle"
-  spec.version       = File.read('VERSION',__FILE__).strip
+  spec.version       = File.read(File.expand_path('../VERSION',__FILE__)).strip
   spec.authors       = ["Maheshwaran G"]
   spec.email         = ["pgmaheshwaran@gmail.com"]
 
@@ -21,7 +21,6 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/*.rb']
 
   spec.add_development_dependency "bundler", "~> 2.0"
-
   spec.add_runtime_dependency "aws-sdk-comprehend"
   spec.add_runtime_dependency "aws-sdk-translate"
 end

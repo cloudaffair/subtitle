@@ -1,6 +1,6 @@
 # Subtitle
 
-Welcome to `subtitle` gem!. Following functionality is provided using AWS services.
+Welcome to `subtitle` gem!. Following functionalities are provided using AWS services.
 
 * Detect the Language code for the given Subtitle file
 * Translates the given subtitle file to required suggested language.
@@ -74,7 +74,7 @@ subtitle.translate_cc(<dest_lang>)
 ```
 
 
-## Development
+## Development 
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
