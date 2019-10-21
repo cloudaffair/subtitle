@@ -3,12 +3,12 @@ require 'aws-sdk-comprehend'
 
 class SCC
 
-=begin
+
   def initialize(awskey, awssecret)
     @translate = Aws::Translate::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
     @comp = Aws::Comprehend::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
   end
-=end
+
   def get_text(srt_file, num_chars)
     ccfile = File.open(srt_file, 'r:UTF-8', &:read)
     text_sample = ""
