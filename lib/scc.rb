@@ -46,24 +46,6 @@ class SCC
     decoded_text
   end
 
-  def encode (plain_text)
-    encoded_text = ""
-    two_bytes_str = ""
-    plain_text.each_char do | char |
-      if char.ord.to_s(2).count("1") % 2 == 0
-        two_bytes_str << char.ord.to_s(16)
-      else
-        puts "test #{(char.to_i(16) | 0x7F  )}"
-        two_bytes_str << (char.to_i(16) | 0x7F  ).to_s(16)
-      end
-      if two_bytes_str.length == 4
-        encoded_text << two_bytes_str+" "
-        two_bytes_str = ""
-      end
-
-    end
-    puts encoded_text
-  end
   def detect_lang(srt_file)
     lang = nil
     begin
@@ -78,11 +60,3 @@ class SCC
     lang
   end
 end
-
-scc = SCC.new
-#"InqScribe works on Mac or Windows."
-scc.encode("InqScribe works on Mac or Windows.")
-#
-#puts scc.decode("94ae 94ae 9420 9420 9452 9452 9723 9723 496e f1d3 e3f2 e962 e520 f7ef f26b 7320 ef6e 94f4 94f4 cd61 e320 eff2 2057 e96e 64ef f773 ae80 942f 942f")
-#c9ee f1d3 e3f2 e9e2 e5a0 f7ef f2eb f3a0 efee a0cd e1e3 a0ef f2a0 d7e9 eee4 eff7 f3ae
-#scc.encode("InqScribe works on Mac or Windows.")
