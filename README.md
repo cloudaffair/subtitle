@@ -16,6 +16,9 @@ Need access to following AWS services.
 * Comprehend
 * Translate
 
+Language pairs supported and limitations
+https://docs.aws.amazon.com/translate/latest/dg/what-is.html#language-pairs 
+
 ## Installation
 
 Add this line to your application's Gemfile:
