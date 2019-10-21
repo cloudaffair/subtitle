@@ -3,7 +3,6 @@ require 'aws-sdk-comprehend'
 
 class SCC
 
-
   def initialize(awskey, awssecret)
     @translate = Aws::Translate::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
     @comp = Aws::Comprehend::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
@@ -46,10 +45,26 @@ class SCC
     decoded_text
   end
 
-  def detect_lang(srt_file)
+  def encode(free_text)
+    encoded_str = ""
+    count = 0
+    free_text.each_byte do |char|
+      count += 1
+      binval = char.to_s(2).count("1") % 2 == 0 ? (char.to_i | 128 ).to_s(2) : char.to_s(2)
+      encode_char = binval.to_i(2).to_s(16)
+      if ((count > 0) && (count % 2 == 0))
+        encoded_str << encode_char << " "
+      else
+        encoded_str << encode_char
+      end
+    end
+    encoded_str
+  end
+
+  def detect_lang(scc_file)
     lang = nil
     begin
-      sample_text = get_text(srt_file, 100)
+      sample_text = get_text(scc_file, 100)
       response = @comp.detect_dominant_language( {
                                                      text: "#{sample_text}"
                                                  })
