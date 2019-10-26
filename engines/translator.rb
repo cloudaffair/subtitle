@@ -6,6 +6,18 @@
 # caption specific implementations
 #
 module Translator
+
+  # 
+  # Constants For Engines
+  ENGINE_AWS = 1
+  ENGINE_GCP = 2
+
+  #
+  # Keys for each Engine
+  AWS_KEYS = [:access_key_id, :secret_access_key, :profile]
+  GCP_KEYS = [:api_key, :project_id, :creds_path]
+  
+  ENGINE_KEYS = {ENGINE_AWS => AWS_KEYS, ENGINE_GCP => GCP_KEYS}
   #
   # This exception shall be raised when we fail to initialize an
   # engine for the purposes of language detection / translation

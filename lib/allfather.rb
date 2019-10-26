@@ -10,7 +10,7 @@ module AllFather
   # 
   # Valid file extensions that we support; Keep expanding as we grow
   #
-  VALID_FILES = ["srt", "vtt"]
+  VALID_FILES = [".srt", ".vtt"]
 
   # 
   # Generic exception class that is raised for validation errors
@@ -32,22 +32,18 @@ module AllFather
   # Method to infer the language of the caption by inspecting the file
   # depending on the type of the caption file
   #
-  # :args: caption_file
-  #
-  # * +caption_file+ - Caption File name in path format
-  #
   # ==== Returns
   #
   # * The ISO 639-1 Letter Language code
   # 
-  def infer_language(caption_file)
+  def infer_language
     raise "Not Implemented. Class #{self.class.name} doesn't implement infer_language"
   end
 
   #
   # Method to translate the caption from one language to another
   #
-  # :args: input_file, src_lang, target_lang, output_file
+  # :args: src_lang, target_lang, output_file
   #
   # * +input_caption+   - A Valid input caption file. Refer to #is_valid?
   # * +src_lang+        - can be inferred using #infer_language method
@@ -61,11 +57,7 @@ module AllFather
   # 2. The output file can't be written
   # 3. The target_lang is not a valid ISO 639-1 Letter Language code
   #
-  def translate(input_file, src_lang, target_lang, output_file)
-    # Check if the input file exists
-    unless File.exists?(input_file)
-      raise InvalidInputException.new("Input file #{input_file} doesn't exist.")
-    end
+  def translate(src_lang, target_lang, output_file)
     # Check if a non empty output file is present and error out to avoid
     # the danger or overwriting some important file !!
     if File.exists?(output_file) && File.size(output_file) > 0
@@ -78,7 +70,7 @@ module AllFather
     end
     # Check if the file is writable ?
     unless File.writable?(output_file)
-      raise InvalidInputException.new("Output file #{input_file} not writable.")
+      raise InvalidInputException.new("Output file #{output_file} not writable.")
     end
     # Further checks can be done only in caption specific implementations
     # or translation engine specific implementation
