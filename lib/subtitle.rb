@@ -1,4 +1,7 @@
 require "srt"
+require_relative "vtt"
+require_relative "../engines/translator"
+require_relative "../engines/aws"
 
 class Subtitle
   def initialize(awskey, awssecret, ccfile)
