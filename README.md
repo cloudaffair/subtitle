@@ -41,27 +41,27 @@ Or install it yourself as:
 ```ruby
 require 'subtitle'
 
-subtitle = Subtitle.new(<aws_key>, <aws_secret>, <cc_file>)
+subtitle = Subtitle.new(options)
 subtitle.detect_language
 
-<aws_key>     : AWS Key
-<aws_secret>  : AWS Secret
-<cc_file>     : Closed Caption File
+where options is a hash with following keys at the minimal
+<access_key_id>         : AWS Key
+<secret_access_key>     : AWS Secret
+<cc_file>               : Closed Caption File
+<profile>               : AWS Profile (If this is provided key and secret is not required)
 ```
 
 ## Translate Closed caption file to desired langauge
 ```ruby
 require 'subtitle'
 
-subtitle = Subtitle.new(<aws_key>, <aws_secret>, <cc_file>)
+subtitle = Subtitle.new(options)
 
-<aws_key>     : AWS Key
-<aws_secret>  : AWS Secret
-<cc_file>     : Closed Caption File
+Refer to Detect Language section above for what can be passed in options
 
 Option 1
 
-subtitle.translate_cc(<dest_lang>, <src_lang> ,<outfile>)
+subtitle.translate(<dest_lang>, <src_lang>, <outfile>)
 
 Option 2
 
@@ -85,7 +85,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/pgmaheshwaran/subtitle. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cloudaffair/subtitle. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -93,4 +93,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Subtitle project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/subtitle/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Subtitle project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/cloudaffair/subtitle/blob/master/CODE_OF_CONDUCT.md).
