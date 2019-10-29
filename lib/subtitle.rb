@@ -81,16 +81,3 @@ class Subtitle
     handler
   end
 end
-
-#s=Subtitle.new({:profile => "comprehend", :cc_file => "/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt"})
-#p s.detect_language
-#s.translate("fr", "en", "/tmp/new_fr.vtt")
-engine = AwsEngine.new({:profile => "comprehend"})
-ttml_handler = TTML.new("../samples/ttml/sample.ttml", engine)
-#p ttml_handler.infer_languages
-ttml_handler.translate("en", "hi", "/tmp/new_hi.ttml")
-#scc_handler = SCC.new("../samples/scc/sample1.scc", engine)
-#p scc_handler.infer_languages
-#vtt_handler = VTT.new(engine)
-#p vtt_handler.infer_languages("/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt")
-#p vtt_handler.translate("/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt", "en", "fr", "/tmp/new.vtt")
