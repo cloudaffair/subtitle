@@ -13,6 +13,7 @@ global_opts = Optimist::options do
   opt :dest_lang, "Language code to translate", :type => :string, :short => "d"
   opt :src_lang, "Source language", :type => :string, :short => "l"
   opt :outfile, "Destination file", :type => :string, :short => "f"
+  opt :force_detect, "Will try to infer the language even if language is provided. By default true if not provided", :type => :boolean, :short => "w", :default => false
 end
 Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc_file]) if global_opts[:cc_file]
 cmd = ARGV.shift # get the subcommand

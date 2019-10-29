@@ -10,12 +10,17 @@ module AllFather
   # 
   # Valid file extensions that we support; Keep expanding as we grow
   #
-  VALID_FILES = [".srt", ".vtt"]
+  VALID_FILES = [".srt", ".vtt", ".ttml"]
 
   # 
   # Generic exception class that is raised for validation errors
   #
   class InvalidInputException < StandardError; end
+
+  #
+  # Lang inference failure exception
+  #
+  class LangDetectionFailureException < StandardError; end
 
   #
   # Method to do basic validations like is this a valid file to even
@@ -29,15 +34,15 @@ module AllFather
   end
 
   #
-  # Method to infer the language of the caption by inspecting the file
+  # Method to infer the language(s) of the caption by inspecting the file
   # depending on the type of the caption file
   #
   # ==== Returns
   #
-  # * The ISO 639-1 Letter Language code
+  # * The ISO 639-1 Letter Language codes
   # 
-  def infer_language
-    raise "Not Implemented. Class #{self.class.name} doesn't implement infer_language"
+  def infer_languages
+    raise "Not Implemented. Class #{self.class.name} doesn't implement infer_languages"
   end
 
   #

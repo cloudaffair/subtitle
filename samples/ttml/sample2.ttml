@@ -1,0 +1,69 @@
+<tt xml:lang="" xmlns="http://www.w3.org/ns/ttml">
+    <head>
+        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
+            <ttm:title>Timed Text TTML Example</ttm:title>
+            <ttm:copyright>The Authors (c) 2006</ttm:copyright>
+        </metadata>
+        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">
+            <!-- s1 specifies default color, font, and text alignment -->
+            <style tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="22px" tts:textAlign="center" xml:id="s1"/>
+            <!-- alternative using yellow text but otherwise the same as style s1 -->
+            <style style="s1" tts:color="yellow" xml:id="s2"/>
+            <!-- a style based on s1 but justified to the right -->
+            <style style="s1" tts:textAlign="end" xml:id="s1Right"/>
+            <!-- a style based on s2 but justified to the left -->
+            <style style="s2" tts:textAlign="start" xml:id="s2Left"/>
+        </styling>
+        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">
+            <region style="s1" tts:backgroundColor="black" tts:displayAlign="after" tts:extent="560px 62px" tts:padding="5px 3px" xml:id="subtitleArea"/>
+        </layout>
+    </head>
+    <body region="subtitleArea">
+        <div xml:lang="en">
+            <p begin="0.76s" end="3.45s" xml:id="subtitle1">It seems a paradox, does it not,
+    </p>
+            <p begin="5.0s" end="10.0s" xml:id="subtitle2"> 
+                <br/>
+                the Retina should be inverted?</p>
+            <p begin="10.0s" end="16.0s" style="s2" xml:id="subtitle3">It is puzzling, why is it
+                <br/>
+                we do not see things upside-down?</p>
+            <p begin="17.2s" end="23.0s" xml:id="subtitle4">You have never heard the Theory,
+                <br/>
+                then, that the Brain also is inverted?</p>
+            <p begin="23.0s" end="27.0s" style="s2" xml:id="subtitle5">No indeed! What a beautiful fact!
+    </p>
+            <p begin="28.0s" end="34.6s" style="s2Left" xml:id="subtitle6a">But how is it proved?
+    </p>
+            <p begin="28.0s" end="34.6s" style="s1Right" xml:id="subtitle6b">Thus: what we call
+    </p>
+            <p begin="34.6s" end="45.0s" style="s1Right" xml:id="subtitle7">the vertex of the Brain
+                <br/>
+                is really its base</p>
+            <p begin="45.0s" end="52.0s" style="s1Right" xml:id="subtitle8">and what we call its base
+                <br/>
+                is really its vertex,</p>
+            <p begin="53.5s" end="58.7s" xml:id="subtitle9a">it is simply a question of nomenclature.
+    </p>
+            <p begin="53.5s" end="58.7s" style="s2" xml:id="subtitle9b">How truly delightful!
+    </p>
+        </div>
+        <div>
+            <p begin="0.76s" end="3.45s" xml:id="subtitle1">It seems a paradox, does it not,
+    </p>
+        </div>
+        <div xml:lang="es">
+            <p begin="0.76s" end="3.45s" xml:id="subtitle1">Parece una paradoja, &#xBF;no es as&#xED;,</p>
+            <p begin="5.0s" end="10.0s" xml:id="subtitle2">que la imagen formada en<br/>la Retina debe ser invertida?</p>
+            <p begin="10.0s" end="16.0s" style="s2" xml:id="subtitle3">Es desconcertante, &#xBF;por qu&#xE9; es<br/>no vemos las cosas al rev&#xE9;s?</p>
+            <p begin="17.2s" end="23.0s" xml:id="subtitle4">Nunca has o&#xED;do la Teor&#xED;a,<br/>entonces, que el Cerebro tambi&#xE9;n se invierte?</p>
+            <p begin="23.0s" end="27.0s" style="s2" xml:id="subtitle5">&#xA1;No, en verdad! &#xA1;Qu&#xE9; hermoso hecho!</p>
+            <p begin="28.0s" end="34.6s" style="s2Left" xml:id="subtitle6a">Pero, &#xBF;c&#xF3;mo se prueba?</p>
+            <p begin="28.0s" end="34.6s" style="s1Right" xml:id="subtitle6b">As&#xED;: lo que llamamos</p>
+            <p begin="34.6s" end="45.0s" style="s1Right" xml:id="subtitle7">el v&#xE9;rtice del Cerebro<br/>es realmente su base</p>
+            <p begin="45.0s" end="52.0s" style="s1Right" xml:id="subtitle8">y lo que llamamos su base<br/>es realmente su v&#xE9;rtice</p>
+            <p begin="53.5s" end="58.7s" xml:id="subtitle9a">se trata simplemente de una cuesti&#xF3;n de nomenclatura.</p>
+            <p begin="53.5s" end="58.7s" style="s2" xml:id="subtitle9b">&#xA1;Qu&#xE9; delicia!</p>
+        </div>
+    </body>
+</tt>

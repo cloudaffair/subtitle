@@ -8,7 +8,7 @@ require_relative "allfather"
 # as defined by the AllFather
 #
 class VTT
-  
+
   include AllFather
 
   def initialize(cc_file, translator)
@@ -58,7 +58,10 @@ class VTT
     end
   end
 
-  def infer_language
+  #
+  # Returns the inferred language in an array
+  #
+  def infer_languages
     lang = nil
     begin
       sample_text = get_text(@cc_file, 100)
@@ -66,7 +69,7 @@ class VTT
     rescue StandardError => e
       puts "Error while detecting the language due to #{e.message}"
     end
-    lang
+    [lang]
   end
 
   # 
@@ -77,6 +80,8 @@ class VTT
     if @cc_file =~ /^.*\.(vtt)$/
       return true
     end
+    # TODO: Check if it's required to do a File read to see if the 1st line is WEBVTT
+    # to handle cases where invalid file is named with vtt extension
     return false
   end
 

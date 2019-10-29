@@ -18,7 +18,7 @@ class SRT
   end
 
   def is_valid?
-    # Do any VTT specific validations here
+    # Do any SRT specific validations here
     if @cc_file =~ /^.*\.(srt)$/
       return true
     end
@@ -41,11 +41,10 @@ class SRT
           if json_text.nil?
             trans_resp = @translator.translate(text_sample, src_lang, dest_lang)
             outfile.puts trans_resp
-            outfile.puts
           else
             outfile.puts text_sample
-            outfile.puts
           end
+          outfile.puts
           text_sample = ""
           text_collection = false
         elsif text_collection
@@ -66,7 +65,7 @@ class SRT
     end
   end
 
-  def infer_language
+  def infer_languages
     lang = nil
     begin
       sample_text = get_text(@cc_file, 100)
@@ -74,7 +73,7 @@ class SRT
     rescue StandardError => e
       puts "Error while detecting the language due to #{e.message}"
     end
-    lang
+    [lang]
   end
 
   private 

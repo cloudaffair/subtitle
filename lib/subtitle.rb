@@ -1,5 +1,7 @@
 require_relative "srt"
 require_relative "vtt"
+require_relative "scc"
+require_relative "ttml"
 require_relative "allfather"
 require_relative "../engines/translator"
 require_relative "../engines/aws"
@@ -11,20 +13,20 @@ class Subtitle
     @cc_file = options[:cc_file]
     raise "Input caption not provided. Please provide the same in :cc_file option" if @cc_file.nil?
     translator = get_translator(options)
-    @handler = get_caption_handler(options[:cc_file], translator)
+    @handler = get_caption_handler(options, translator)
   end
 
   def detect_language
-    @handler.infer_language
+    @handler.infer_languages
   end
 
   def translate(dest_lang, src_lang = nil, outfile = nil)
     if outfile.nil?
-      outfile = "#{@ccfile}_#{dest_lang}"
+      outfile = "#{@cc_file}_#{dest_lang}"
     end
     if src_lang.nil?
-      src_lang = detect_language
-      raise "could not detect Source Language!!"  if src_lang.nil?
+      src_lang = detect_language[0] rescue nil
+      raise "Could not detect Source Language!!" if src_lang.nil?
     end
     @handler.translate(src_lang, dest_lang, outfile)
     outfile
@@ -59,7 +61,8 @@ class Subtitle
     translator
   end
 
-  def get_caption_handler(caption_file, translator)
+  def get_caption_handler(options, translator)
+    caption_file = options[:cc_file]
     extension = File.extname(caption_file)
     unless AllFather::VALID_FILES.include?(extension)
       raise "Caption support for #{caption_file} of type #{extension} is not supported yet" 
@@ -70,9 +73,24 @@ class Subtitle
       handler = SRT.new(caption_file, translator)
     when ".vtt"
       handler = VTT.new(caption_file, translator)
+    when ".ttml"
+      handler = TTML.new(caption_file, translator, {:force_detect => options[:force_detect]})
     else
       raise "Cannot handle file type .#{extension}"
     end
     handler
   end
 end
+
+#s=Subtitle.new({:profile => "comprehend", :cc_file => "/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt"})
+#p s.detect_language
+#s.translate("fr", "en", "/tmp/new_fr.vtt")
+engine = AwsEngine.new({:profile => "comprehend"})
+ttml_handler = TTML.new("../samples/ttml/sample.ttml", engine)
+#p ttml_handler.infer_languages
+ttml_handler.translate("en", "hi", "/tmp/new_hi.ttml")
+#scc_handler = SCC.new("../samples/scc/sample1.scc", engine)
+#p scc_handler.infer_languages
+#vtt_handler = VTT.new(engine)
+#p vtt_handler.infer_languages("/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt")
+#p vtt_handler.translate("/Users/arunjeyaprasad/bcwork/demo/bunny00003.vtt", "en", "fr", "/tmp/new.vtt")
