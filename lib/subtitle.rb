@@ -3,8 +3,8 @@ require_relative "vtt"
 require_relative "scc"
 require_relative "ttml"
 require_relative "allfather"
-require_relative "../engines/translator"
-require_relative "../engines/aws"
+require_relative "engines/translator"
+require_relative "engines/aws"
 
 
 class Subtitle

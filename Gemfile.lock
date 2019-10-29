@@ -17,6 +17,9 @@ GEM
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
     jmespath (1.4.0)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.3)
+      mini_portile2 (~> 2.4.0)
     optimist (3.0.0)
 
 PLATFORMS
@@ -25,6 +28,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk-comprehend
   aws-sdk-translate
+  nokogiri (= 1.10.3)
   optimist
 
 BUNDLED WITH

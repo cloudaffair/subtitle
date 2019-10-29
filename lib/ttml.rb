@@ -1,4 +1,4 @@
-require_relative "../engines/translator"
+require_relative "engines/translator"
 require_relative "allfather"
 
 require "nokogiri"
