@@ -1,12 +1,46 @@
-require 'aws-sdk-translate'
-require 'aws-sdk-comprehend'
+require_relative "engines/translator"
+require_relative "allfather"
 
+#
+# Library to handle SCC Files
+#
+# Uses the translator available to do the necessary language operations
+# as defined by the AllFather
+#
 class SCC
 
-  def initialize(awskey, awssecret)
-    @translate = Aws::Translate::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
-    @comp = Aws::Comprehend::Client.new(:access_key_id => "#{awskey}", :secret_access_key => "#{awssecret}")
+  include AllFather
+
+  def initialize(cc_file, translator)
+    @cc_file = cc_file
+    @translator = translator
+    raise "Invalid SCC file provided" unless is_valid?
   end
+
+  def is_valid?
+    # Do any SCC specific validations here
+    if @cc_file =~ /^.*\.(scc)$/
+      return true
+    end
+    return false
+  end
+
+  def infer_language
+    lang = nil
+    begin
+      sample_text = get_text(@cc_file, 100)
+      lang = @translator.infer_language(sample_text)
+    rescue StandardError => e
+      puts "Error while detecting the language due to #{e.message}"
+    end
+    lang
+  end
+
+  def translate(src_lang, dest_lang, out_file)
+    raise "Not Implemented. Class #{self.class.name} doesn't implement translate yet !!"
+  end
+
+  private
 
   def get_text(srt_file, num_chars)
     ccfile = File.open(srt_file, 'r:UTF-8', &:read)
@@ -15,12 +49,12 @@ class SCC
       if line =~ /^\d\d:\d\d:\d\d:\d\d\s/
         scc_text_code = line.gsub(/^\d\d:\d\d:\d\d:\d\d\s/, '')
         text_sample << decode(scc_text_code)
-        if text_sample.length > (num_chars+1)
+        if text_sample.length > (num_chars + 1)
           break
         end
       end
     end
-    return text_sample[0,num_chars]
+    return text_sample[0, num_chars]
   end
 
   def decode(scc_code_text)
@@ -31,7 +65,7 @@ class SCC
     hex_codes.each do | code |
       if ["94", "91", "92", "97", "15", "16", "10", "13"].include?(code)
         skip_next = true
-        skip_count = skip_count +1
+        skip_count = skip_count + 1
         next
       end
       if skip_count == 1 && skip_next
@@ -59,19 +93,5 @@ class SCC
       end
     end
     encoded_str
-  end
-
-  def detect_lang(scc_file)
-    lang = nil
-    begin
-      sample_text = get_text(scc_file, 100)
-      response = @comp.detect_dominant_language( {
-                                                     text: "#{sample_text}"
-                                                 })
-      lang = response[:languages][0][:language_code] rescue nil
-    rescue => error
-      puts "Error while detecting the language!!"
-    end
-    lang
   end
 end
