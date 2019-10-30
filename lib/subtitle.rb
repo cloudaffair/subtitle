@@ -2,6 +2,7 @@ require_relative "srt"
 require_relative "vtt"
 require_relative "scc"
 require_relative "ttml"
+require_relative "dfxp"
 require_relative "allfather"
 require_relative "engines/translator"
 require_relative "engines/aws"
@@ -69,12 +70,16 @@ class Subtitle
     end
     handler = nil
     case extension.downcase
+    when ".scc"
+      handler = SCC.new(caption_file, translator)
     when ".srt"
       handler = SRT.new(caption_file, translator)
     when ".vtt"
       handler = VTT.new(caption_file, translator)
     when ".ttml"
       handler = TTML.new(caption_file, translator, {:force_detect => options[:force_detect]})
+    when ".dfxp"
+      handler = DFXP.new(caption_file, translator, {:force_detect => options[:force_detect]})
     else
       raise "Cannot handle file type .#{extension}"
     end

@@ -1,5 +1,5 @@
 require "optimist"
-require "subtitle"
+require_relative "../lib/subtitle"
 
 
 SUB_COMMANDS = %w(detectlang translate)
