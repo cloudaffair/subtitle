@@ -10,7 +10,7 @@ module AllFather
   # 
   # Valid file extensions that we support; Keep expanding as we grow
   #
-  VALID_FILES = [".srt", ".vtt", ".ttml"]
+  VALID_FILES = [".scc", ".srt", ".vtt", ".ttml", ".dfxp"]
 
   # 
   # Generic exception class that is raised for validation errors

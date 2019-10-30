@@ -25,7 +25,7 @@ class SCC
     return false
   end
 
-  def infer_language
+  def infer_languages
     lang = nil
     begin
       sample_text = get_text(@cc_file, 100)

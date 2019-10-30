@@ -11,6 +11,7 @@ Supports following subtitle files
 * WebVTT (.vtt) 
 * TTML   (.ttml)
 * SCC    (.scc)
+* DFXP   (.dfxp)
 
 ## Prerequisite 
 Need access to following AWS services.
