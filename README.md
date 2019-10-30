@@ -9,6 +9,8 @@ Supports following subtitle files
 
 * SubRip (.srt)
 * WebVTT (.vtt) 
+* TTML   (.ttml)
+* SCC    (.scc)
 
 ## Prerequisite 
 Need access to following AWS services.
