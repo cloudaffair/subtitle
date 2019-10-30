@@ -11,6 +11,7 @@ Supports following subtitle files
 * WebVTT (.vtt) 
 * TTML   (.ttml)
 * SCC    (.scc)
+* DFXP   (.dfxp)
 
 ## Prerequisite 
 Need access to following AWS services.
@@ -47,10 +48,13 @@ subtitle = Subtitle.new(options)
 subtitle.detect_language
 
 where options is a hash with following keys at the minimal
-<access_key_id>         : AWS Key
-<secret_access_key>     : AWS Secret
-<cc_file>               : Closed Caption File
-<profile>               : AWS Profile (If this is provided key and secret is not required)
+<access_key_id>             : AWS Key
+<secret_access_key>         : AWS Secret
+<cc_file>                   : Closed Caption File
+<profile>[Optional]         : AWS Profile (If this is provided key and secret is not required)
+<force_detect>[Optional]    : By default false. If this is true then, even if the caption file declares the language
+                              we will try to infer the language. If it's false, the declared language would be returned. 
+                              Is applicable only when subtile format encapsulates the language information.
 ```
 
 ## Translate Closed caption file to desired langauge
@@ -84,6 +88,9 @@ subtitle.translate(<dest_lang>)
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## Limitation
+* Translation from one language to another language is NOT supported for SubRip format.
 
 ## Contributing
 

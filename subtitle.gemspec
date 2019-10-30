@@ -4,11 +4,11 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 Gem::Specification.new do |spec|
   spec.name          = "subtitle"
   spec.version       = File.read(File.expand_path('../VERSION',__FILE__)).strip
-  spec.authors       = ["Maheshwaran G"]
-  spec.email         = ["pgmaheshwaran@gmail.com"]
+  spec.authors       = ["Maheshwaran G", "Arunjeyaprasad A J"]
+  spec.email         = ["pgmaheshwaran@gmail.com", "arunjeyaprasad@gmail.com"]
 
-  spec.summary       = "subtitle helps you to detect language and translate closed caption to required language"
-  spec.description   = "subtitle gem to detect and translate closed caption for SubRip and WebVTT"
+  spec.summary       = "Subtitle gem helps you to detect language and translate closed caption to required language"
+  spec.description   = "Subtitle gem helps you to detect language and translate closed caption to required language."
   spec.homepage      = "https://github.com/cloudaffair/subtitle"
   spec.license       = "MIT"
 
@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/*.rb','lib/engines/*.rb']
 
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_runtime_dependency "aws-sdk-comprehend"
-  spec.add_runtime_dependency "aws-sdk-translate"
+  spec.add_runtime_dependency "aws-sdk-comprehend", "=1.25.0"
+  spec.add_runtime_dependency "aws-sdk-translate", "=1.17.0"
+  spec.add_runtime_dependency "nokogiri", "=1.10.4"
 end
