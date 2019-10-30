@@ -9,6 +9,8 @@ Supports following subtitle files
 
 * SubRip (.srt)
 * WebVTT (.vtt) 
+* TTML   (.ttml)
+* SCC    (.scc)
 
 ## Prerequisite 
 Need access to following AWS services.
@@ -65,11 +67,11 @@ subtitle.translate(<dest_lang>, <src_lang>, <outfile>)
 
 Option 2
 
-subtitle.translate_cc(<dest_lang>, <src_lang>)
+subtitle.translate(<dest_lang>, <src_lang>)
 
 Option 3
 
-subtitle.translate_cc(<dest_lang>)
+subtitle.translate(<dest_lang>)
 
 <dest_lang>   : Provide translate Language code (ISO639 2 Letter Code)
 <src_lang>    : Provide  source Language code (ISO639 2 Letter Code). If not supplied, the source language will be auto detected.
