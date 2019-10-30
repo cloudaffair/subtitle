@@ -68,7 +68,7 @@ class TTML
   end
 
   def translate(src_lang, dest_lang, out_file)
-    #super(src_lang, dest_lang, out_file)
+    super(src_lang, dest_lang, out_file)
     xml_file = File.open(@cc_file, 'r:UTF-8', &:read)
     xml_doc  = Nokogiri::XML(xml_file)
     div_objects = xml_doc.css("/tt/body/div")

@@ -70,6 +70,11 @@ class AwsEngine
   # 
   # Invokes the language detection API of AWS and returns only the language
   # of the highest score and returns the ISO 639-1 code
+  #
+  # :args: text
+  # 
+  # ===== Arguments 
+  # * +text+ - The text for which the language is to be inferred
   # 
   def infer_language(text)
     response = @comprehend_service.detect_dominant_language({ text: "#{text}" })
@@ -81,6 +86,12 @@ class AwsEngine
   # as per the arguments provided
   # Will Raise exception if a translation cannot be made between the source
   # and target language codes or if the lang code is invalid
+  #
+  # :args: input_text, src_lang, target_lang
+  #
+  # * +input_text+      - The text that needs to be translated
+  # * +src_lang+        - The source language of the text
+  # * +target_lang+     - The target language to which the input_text needs to be translated to
   #
   def translate(input_text, src_lang, target_lang)
     response = @translate_service.translate_text({ :text => "#{input_text}" , 
