@@ -22,6 +22,12 @@ Need access to following AWS services.
 Language pairs supported and limitations
 https://docs.aws.amazon.com/translate/latest/dg/what-is.html#language-pairs 
 
+## High level schematic view
+![alt text](https://github.com/cloudaffair/subtitle/blob/master/misc/subtitle1.png)
+
+## Possible Business case flow
+![alt text](https://github.com/cloudaffair/subtitle/blob/master/misc/subtitle2.png)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -40,12 +46,11 @@ Or install it yourself as:
 
 ## Usage
 
-## Detect Language
+## Subtitle initialisation
 ```ruby
 require 'subtitle'
 
 subtitle = Subtitle.new(options)
-subtitle.detect_language
 
 where options is a hash with following keys at the minimal
 <access_key_id>             : AWS Key
@@ -55,6 +60,14 @@ where options is a hash with following keys at the minimal
 <force_detect>[Optional]    : By default false. If this is true then, even if the caption file declares the language
                               we will try to infer the language. If it's false, the declared language would be returned. 
                               Is applicable only when subtile format encapsulates the language information.
+```
+
+## Detect Language
+```ruby
+require 'subtitle'
+
+subtitle = Subtitle.new(options)
+subtitle.detect_language
 ```
 
 ## Translate Closed caption file to desired langauge
@@ -90,7 +103,7 @@ After checking out the repo, run `bin/setup` to install dependencies. You can al
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Limitation
-* Translation from one language to another language is NOT supported for SubRip format.
+* Translation from one language to another language is NOT supported for SCC format.
 
 ## Contributing
 
