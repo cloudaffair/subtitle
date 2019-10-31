@@ -21,7 +21,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/*.rb','lib/engines/*.rb']
 
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_runtime_dependency "aws-sdk-comprehend", "=1.25.0"
-  spec.add_runtime_dependency "aws-sdk-translate", "=1.17.0"
-  spec.add_runtime_dependency "nokogiri", "=1.10.4"
+  #spec.add_runtime_dependency "aws-sdk-comprehend", "=1.25.0"
+  #spec.add_runtime_dependency "aws-sdk-translate", "=1.17.0"
+  #spec.add_runtime_dependency "nokogiri", "=1.10.4"
+  spec.add_development_dependency "aws-sdk", "~> 2.11"
 end

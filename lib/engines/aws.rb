@@ -1,5 +1,5 @@
-require 'aws-sdk-translate'
-require 'aws-sdk-comprehend'
+require 'aws-sdk'
+require 'aws-sdk'
 require_relative 'translator'
 
 # 
