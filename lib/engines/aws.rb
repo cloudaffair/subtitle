@@ -10,10 +10,9 @@ require_relative 'translator'
 # == Credential Referencing Order
 #
 # * [Arguments]             - Pass the credentials access_key_id and secret_access_key as arguments
-# * [Environment route]     - AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY can be exposed as 
-# environment variables
+# * [Environment route]     - AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY can be exposed as environment variables
 # * [Profile Name]          - The application uses the credentials of the system and picks the
-# credentials referred to by the profile
+#  credentials referred to by the profile
 #
 class AwsEngine
   include Translator
@@ -71,9 +70,6 @@ class AwsEngine
   # Invokes the language detection API of AWS and returns only the language
   # of the highest score and returns the ISO 639-1 code
   #
-  # :args: text
-  # 
-  # ===== Arguments 
   # * +text+ - The text for which the language is to be inferred
   # 
   def infer_language(text)
@@ -83,11 +79,9 @@ class AwsEngine
 
   # 
   # Invokes the translation API of AWS and returns the translated text
-  # as per the arguments provided
+  # as per the arguments provided.
   # Will Raise exception if a translation cannot be made between the source
   # and target language codes or if the lang code is invalid
-  #
-  # :args: input_text, src_lang, target_lang
   #
   # * +input_text+      - The text that needs to be translated
   # * +src_lang+        - The source language of the text
