@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/subtitle.svg)](https://badge.fury.io/rb/subtitle)
+
 # Subtitle
 
 Welcome to `subtitle` gem!. Following functionalities are provided using AWS services.
