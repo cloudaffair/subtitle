@@ -1,12 +1,14 @@
-[![Gem Version](https://badge.fury.io/rb/subtitle.svg)](https://badge.fury.io/rb/subtitle)
-
 # Subtitle
+
+[![Gem Version](https://badge.fury.io/rb/subtitle.svg)](https://badge.fury.io/rb/subtitle)
+[![Build Status](https://travis-ci.org/cloudaffair/subtitle.svg?branch=master)](https://travis-ci.org/cloudaffair/subtitle)
+
 
 Welcome to `subtitle` gem!. Following functionalities are provided using AWS services.
 
 * Detect the Language code for the given Subtitle file
 * Translates the given subtitle file to required suggested language.
-* Auto detects the type of the subtitle in case no extension is provided.
+* Auto detects the type of subtitle in case no extension to the file provided.
 
 Supports following subtitle files
 
