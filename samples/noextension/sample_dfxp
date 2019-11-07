@@ -1,0 +1,52 @@
+<tt xml:lang="" xmlns="http://www.w3.org/2004/11/ttaf1">
+	<head>
+		<meta xmlns:ttm="http://www.w3.org/2004/11/ttaf1#metadata">
+			<ttm:title>Timed Text DFXP Example</ttm:title>
+			<ttm:copyright>The Authors (c) 2004</ttm:copyright>
+		</meta>
+		<styling xmlns:tts="http://www.w3.org/2004/11/ttaf1#styling">
+			<!-- s1 specifies default color, font, and text alignment -->
+			<style id="s1" tts:color="white" tts:fontFamily="proportional-sans-serif" tts:fontSize="22px" tts:textAlign="center"/>
+			<!-- alternative using yellow text but otherwise the same as style s1 -->
+			<style id="s2" style="s1" tts:color="yellow"/>
+			<!-- a style based on s1 but justified to the right -->
+			<style id="s1Right" style="s1" tts:textAlign="end"/>
+			<!-- a style based on s2 but justified to the left -->
+			<style id="s2Left" style="s2" tts:textAlign="start"/>
+		</styling>
+		<layout xmlns:tts="http://www.w3.org/2004/11/ttaf1#styling">
+			<region id="subtitleArea" style="s1" tts:backgroundColor="black" tts:displayAlign="after" tts:extent="560px 62px" tts:padding="5px 3px"/>
+		</layout>
+	</head>
+	<body region="subtitleArea">
+		<div>
+			<p begin="0.76" end="3.45" id="subtitle1">It seems a paradox, does it not,
+    </p>
+			<p begin="5.0" end="10.0" id="subtitle2">that the image formed on
+				<br/>
+				the Retina should be inverted?</p>
+			<p begin="10.0" end="16.0" id="subtitle3" style="s2">It is puzzling, why is it
+				<br/>
+				we do not see things upside-down?</p>
+			<p begin="17.2" end="23.0" id="subtitle4">You have never heard the Theory,
+				<br/>
+				then, that the Brain also is inverted?</p>
+			<p begin="23.0" end="27.0" id="subtitle5" style="s2">No indeed! What a beautiful fact!
+    </p>
+			<p begin="28.0" end="34.6" id="subtitle6a" style="s2Left">But how is it proved?+14
+    </p>
+			<p begin="28.0" end="34.6" id="subtitle6b" style="s1Right">Thus: what we call
+    </p>
+			<p begin="34.6" end="45.0" id="subtitle7" style="s1Right">the vertex of the Brain
+				<br/>
+				is really its base</p>
+			<p begin="45.0" end="52.0" id="subtitle8" style="s1Right">and what we call its base
+				<br/>
+				is really its vertex,</p>
+			<p begin="53.5" end="58.7" id="subtitle9a">it is simply a question of nomenclature.
+    </p>
+			<p begin="53.5" end="58.7" id="subtitle9b" style="s2">How truly delightful!
+    </p>
+		</div>
+	</body>
+</tt>
