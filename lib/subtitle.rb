@@ -33,6 +33,34 @@ class Subtitle
     outfile
   end
 
+  def type
+    type = nil
+    ccfile = File.open(@cc_file, 'r:UTF-8', &:read)
+    ccfile.each_line do | line |
+      if line =~ /^(\d\d:)\d\d:\d\d[,]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[,]\d\d\d/
+        type = "srt"
+      elsif line =~ /(^(\d\d:)\d\d:\d\d[.]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[.]\d\d\d)|(^WEBVTT$)/
+        type = "vtt"
+      elsif line =~ /(^\d\d:\d\d:\d\d:\d\d\t(([0-9a-fA-F]{4})\s)*)+|(^Scenarist_SCC V(\d.\d)$)/
+        type = "scc"
+      end
+    end
+    unless type
+      doc = File.open(@cc_file) { |f| Nokogiri::XML(f) }
+      namespace = doc.namespaces["xmlns"]
+      if doc.errors.empty?
+        if doc.xpath('/*').first.name == 'tt' && !doc.css('/tt/head').nil? && !doc.css('/tt/body').nil?
+          if namespace =~ /\/ttaf1/
+            type = "dfxp"
+          elsif namespace =~ /\/ttml/
+            type = "ttml"
+          end
+        end
+      end
+    end
+    type
+  end
+
   private
 
   def get_translator(options)

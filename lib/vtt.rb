@@ -25,7 +25,7 @@ class VTT
       text_collection = false
       text_sample = ""
       ccfile.each_line do | line |
-        if line =~ /^(\d\d:)\d\d:\d\d[,.]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[,.]\d\d\d/
+        if line =~ /^[\d\d:]?\d\d:\d\d[,.]\d\d\d.*-->.*[\d\d:]?\d\d:\d\d[,.]\d\d\d/
           text_collection = true
           outfile.puts line
         elsif line.strip.empty? && !text_sample.empty?
@@ -98,7 +98,7 @@ class VTT
       text_collection = false
       text_sample = ""
       ccfile.each_line do |line|
-        if line =~ /^(\d\d:)\d\d:\d\d[,.]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[,.]\d\d\d/
+        if line =~ /^[\d\d:]?\d\d:\d\d[,.]\d\d\d.*-->.*[\d\d:]?\d\d:\d\d[,.]\d\d\d/
           text_collection = true
         elsif line.strip.empty?
           text_collection = false

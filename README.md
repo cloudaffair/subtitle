@@ -1,9 +1,14 @@
 # Subtitle
 
+[![Gem Version](https://badge.fury.io/rb/subtitle.svg)](https://badge.fury.io/rb/subtitle)
+[![Build Status](https://travis-ci.org/cloudaffair/subtitle.svg?branch=master)](https://travis-ci.org/cloudaffair/subtitle)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](pgmaheshwaran@gmail.com)
+
 Welcome to `subtitle` gem!. Following functionalities are provided using AWS services.
 
 * Detect the Language code for the given Subtitle file
 * Translates the given subtitle file to required suggested language.
+* Auto detects the type of subtitle in case no extension to the file provided.
 
 Supports following subtitle files
 
@@ -93,6 +98,25 @@ subtitle.translate(<dest_lang>)
 <dest_lang>   : Provide translate Language code (ISO639 2 Letter Code)
 <src_lang>    : Provide  source Language code (ISO639 2 Letter Code). If not supplied, the source language will be auto detected.
 <outfile>     : Destination for translated closed caption file.
+```
+
+## Identify the type if extension of the file does not exist
+```ruby
+require 'subtitle'
+
+subtitle = Subtitle.new(options)
+ 
+# in case the <cc_file> is supplied with subtitle type SRT and the file name does not hold extension.
+
+subtitle.type
+ 
+Returned values
+* srt
+* dfxp
+* vtt
+* scc
+ 
+# Returns `nil` in case does not match any type.
 ```
 
 
