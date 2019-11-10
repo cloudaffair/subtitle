@@ -1,3 +1,5 @@
+require 'fileutils'
+
 # 
 # A Module that kind of acts as an interface where the generic methods
 # that applies to each caption type can be defined
@@ -11,6 +13,15 @@ module AllFather
   # Valid file extensions that we support; Keep expanding as we grow
   #
   VALID_FILES = [".scc", ".srt", ".vtt", ".ttml", ".dfxp"]
+
+  #
+  # Caption type constants
+  #
+  TYPE_SCC  = 1
+  TYPE_SRT  = 2
+  TYPE_VTT  = 3
+  TYPE_TTML = 4
+  TYPE_DFXP = 5
 
   # 
   # Generic exception class that is raised for validation errors
@@ -50,7 +61,6 @@ module AllFather
   #
   # :args: src_lang, target_lang, output_file
   #
-  # * +input_caption+   - A Valid input caption file. Refer to #is_valid?
   # * +src_lang+        - can be inferred using #infer_language method
   # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
   # * +output_file+     - Output file. Can be a fully qualified path or just file name
@@ -79,5 +89,53 @@ module AllFather
     end
     # Further checks can be done only in caption specific implementations
     # or translation engine specific implementation
+  end
+
+  #
+  # Method to convert from one caption type to other types. If the src_lang is not provided
+  # then all source languages will be converted to target types. For example, if a ttml file
+  # has "en" and "es" and target_type is vtt and no src_lang is provided 2 vtt files would be
+  # created one per language in the source. if a target_lang is provided then one of the lang
+  # from source would be picked for creating the output file with target_lang
+  #
+  # If no target_lang is provided, no translations are applied. output_file is created using
+  # without any need for any language translation services. Hence doesn't incur any cost !!
+  #
+  # * +types+           - An array of Valid input caption type(s). Refer to `#CaptionType`
+  # * +src_lang+        - can be inferred using #infer_language method
+  # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
+  # * +output_dir+      - Output Directory. Generated files would be dumped here
+  #
+  # ==== Raises
+  # 
+  # InvalidInputException shall be raised if
+  # 1. The input file doesn't exist or is unreadable or is invalid caption
+  # 2. The output dir doesn't exist 
+  # 3. Invalid lang codes for a given caption type
+  # 4. Unsupported type to which conversion is requested for
+  #
+  def transform_to(types, src_lang, target_lang, output_dir)
+    if (types - supported_transformations).size != 0
+      raise InvalidInputException.new("Unknown types provided for conversion in input #{types}")
+    end
+    unless File.directory?(output_dir)
+      FileUtils.mkdir_p(output_dir)
+    end
+    # Basic validations
+    if types.include?(TYPE_SCC)
+      unless target_lang.eql?("en")
+        raise InvalidInputException.new("SCC can be generated only in en. #{target_lang} is unsupported")
+      end
+    end
+  end
+
+  # 
+  # Method to report on the supported transformations. Each implementor is free to return
+  # the types to which it can convert itself to
+  #
+  # Returns an array of one or more types defined as +TYPE_+ constants here 
+  #
+  def supported_transformations
+    raise "Not Implemented. Class #{self.class.name} doesn't implement supported_transformations"
   end
 end

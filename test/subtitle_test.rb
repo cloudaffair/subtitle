@@ -12,7 +12,7 @@ global_opts = Optimist::options do
   opt :cc_file, "Closed caption File", :type => :string, :short => "i", :required => true
   opt :dest_lang, "Language code to translate", :type => :string, :short => "d"
   opt :src_lang, "Source language", :type => :string, :short => "l"
-  opt :outfile, "Destination file", :type => :string, :short => "f"
+  opt :outfile, "Destination file / directory", :type => :string, :short => "f"
   opt :force_detect, "Will try to infer the language even if language is provided. By default false if not provided", :type => :boolean, :short => "w", :default => false
 end
 Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc_file]) if global_opts[:cc_file]

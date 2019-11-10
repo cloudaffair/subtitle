@@ -79,7 +79,7 @@ class SCC
     decoded_text
   end
 
-  def encode(free_text)
+  def self.encode(free_text)
     encoded_str = ""
     count = 0
     free_text.each_byte do |char|
