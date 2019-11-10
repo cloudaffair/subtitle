@@ -268,10 +268,9 @@ module CommonUtils
       # Pretty print the output for ttml & dfxp
       file_map.each do |type, file_path|
         next unless [AllFather::TYPE_DFXP, AllFather::TYPE_TTML].include?(type)
-        p File.open(file_path, 'r:UTF-8', &:read)
-        xml_doc = Nokogiri::XML(file_path, &:noblanks)
-        p xml_doc.to_xml(:indent => 2)
-        File.write("/tmp/arun_srt/tt.xml", xml_doc.to_s)
+        file = File.open(file_path, "r")
+        xml_doc = Nokogiri::XML(file, &:noblanks)
+        File.write(file_path, xml_doc.to_s)
       end
     end
   end
