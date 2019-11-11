@@ -2,7 +2,6 @@ require_relative "engines/translator"
 require_relative "utils/common_utils"
 require_relative "utils/cue_info"
 require_relative "allfather"
-require "tempfile"
 
 #
 # Library to handle SRT Files

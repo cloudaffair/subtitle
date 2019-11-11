@@ -5,9 +5,10 @@ class CueInfo
     @message = ""
     @start_time_units = []
     @end_time_units = []
+    @index = 1
   end
 
-  attr_reader :type, :start, :end, :sequence, :message, :start_time_units, :end_time_units
+  attr_reader :type, :start, :end, :sequence, :message, :start_time_units, :end_time_units, :index
 
   def start=(start)
     @start = start 
@@ -23,6 +24,10 @@ class CueInfo
 
   def sequence=(seq)
     @sequence = seq 
+  end
+
+  def index=(index)
+    @index = index
   end
 
   def start_time_units=(units)

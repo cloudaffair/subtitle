@@ -1,4 +1,6 @@
 require_relative "engines/translator"
+require_relative "utils/common_utils"
+require_relative "utils/cue_info"
 require_relative "allfather"
 
 #
@@ -10,6 +12,9 @@ require_relative "allfather"
 class VTT
 
   include AllFather
+  include CommonUtils
+
+  SUPPORTED_TRANSFORMATIONS = [TYPE_SCC, TYPE_SRT, TYPE_TTML, TYPE_DFXP]
 
   def initialize(cc_file, translator)
     @cc_file = cc_file
@@ -83,6 +88,69 @@ class VTT
     # TODO: Check if it's required to do a File read to see if the 1st line is WEBVTT
     # to handle cases where invalid file is named with vtt extension
     return false
+  end
+
+  def supported_transformations
+    return SUPPORTED_TRANSFORMATIONS
+  end
+
+  def transform_to(types, src_lang, target_lang, output_dir)
+    # Let's start off with some validations
+    super(types, src_lang, target_lang, output_dir)
+
+    # Suffix output dir with File seperator
+    output_dir = "#{output_dir}#{File::Separator}" unless output_dir.end_with?(File::Separator)
+    
+    # Prepare the output files for each type
+    file_map = {}
+    types.each do |type|
+      output_file = File.basename(@cc_file, File.extname(@cc_file)) + extension_from_type(type)
+      out_file = "#{output_dir}#{output_file}"
+      if create_file(type, out_file, target_lang)
+        file_map[type] = out_file
+      else
+        raise StandardError.new("Failed to create output file for type #{type}")
+      end
+    end
+
+    # Read the file and prepare the cue model
+    cue_info = nil
+    ccfile = File.open(@cc_file, 'r:UTF-8', &:read)
+    message = ""
+    collect_msg = false
+    cue_index = 1
+    ccfile.each_line do | line |
+      if line.strip.empty?
+        collect_msg = false
+        next 
+      end
+      time_points = line.scan(/^((\d\d:)+\d\d[.,]\d\d\d)\s-->\s((\d\d:)+\d\d[.,]\d\d\d)/)
+      if time_points.empty?
+        if collect_msg
+          message << line
+        end
+      else
+        collect_msg = false
+        unless message.empty?
+          cue_info.message = message 
+          write_cue(cue_info, file_map)
+          message = ""
+          cue_index += 1
+        end
+        # This is a cue point. Fetch timestamps
+        cue_info = CueInfo.new(AllFather::TYPE_VTT)
+        cue_info.index = cue_index
+        cue_info.start = time_points[0][0]
+        cue_info.end = time_points[0][2]
+        start_units = time_details(cue_info.start, TYPE_VTT)
+        end_units = time_details(cue_info.end, TYPE_VTT)
+        cue_info.start_time_units = start_units
+        cue_info.end_time_units = end_units
+        collect_msg = true
+      end
+    end
+    cue_info.message = message unless message.empty?
+    write_cue(cue_info, file_map, true)
   end
 
   private 
