@@ -100,7 +100,7 @@ class SRT
     types.each do |type|
       output_file = File.basename(@cc_file, File.extname(@cc_file)) + extension_from_type(type)
       out_file = "#{output_dir}#{output_file}"
-      if create_file(type, out_file, target_lang)
+      if create_file(TYPE_SRT, type, out_file, target_lang)
         file_map[type] = out_file
       else
         raise StandardError.new("Failed to create output file for type #{type}")

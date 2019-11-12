@@ -12,7 +12,8 @@ module CommonUtils
   # further updated with the transformed caption details by respective
   # implementations
   #
-  # * +type+          - Target caption type. Refer to AllFather::TYPE_SCC type constants
+  # * +src_type+      - Source caption type. Refer to AllFather::TYPE_SCC type constants
+  # * +dest_type+     - Target caption type. Refer to AllFather::TYPE_SCC type constants
   # * +output_file+   - Creates this output_file to which type specific
   #  information would be dumped into
   # * +target_lang+   - Target lang of the output_file
@@ -20,7 +21,7 @@ module CommonUtils
   # ==== Returns
   # true if the file is created with right headers and false otherwise
   #
-  def create_file(type, output_file, target_lang)
+  def create_file(src_type, dest_type, output_file, target_lang)
     file = nil
     done = false
     begin
@@ -28,7 +29,7 @@ module CommonUtils
       file = File.open(output_file, "w")
 
       # Dump the initial info into the file to start off with
-      case type
+      case dest_type
       when AllFather::TYPE_SCC
         file.write("Scenarist_SCC V1.0\n\n")
 

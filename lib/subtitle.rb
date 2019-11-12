@@ -133,7 +133,7 @@ class Subtitle
   def get_caption_handler(options, translator)
     caption_file = options[:cc_file]
     extension = File.extname(caption_file)
-    extension = ".#{type}" unless extension.nil?
+    extension = ".#{type}" if extension.nil?
     unless AllFather::VALID_FILES.include?(extension)
       raise "Caption support for #{caption_file} of type #{extension} is not supported yet" 
     end
