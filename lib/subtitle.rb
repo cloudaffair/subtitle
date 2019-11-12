@@ -9,19 +9,22 @@ require_relative "engines/aws"
 
 
 class Subtitle
-  def initialize(options={})
+  def initialize(file, options = nil)
     # Infer the caption handler from the extension
-    @cc_file = options[:cc_file]
+    @cc_file = file
     raise "Input caption not provided. Please provide the same in :cc_file option" if @cc_file.nil?
-    translator = get_translator(options)
-    @handler = get_caption_handler(options, translator)
+    initialize_handler(options) unless  options.nil?
   end
 
-  def detect_language
+
+
+  def detect_language(options = nil)
+    initialize_handler(options) if @handler.nil?
     @handler.infer_languages
   end
 
-  def translate(dest_lang, src_lang = nil, outfile = nil)
+  def translate(dest_lang, src_lang = nil, outfile = nil, options = nil)
+    initialize_handler(options) unless  @handler.nil?
     if outfile.nil?
       outfile = "#{@cc_file}_#{dest_lang}"
     end
@@ -39,7 +42,7 @@ class Subtitle
     ccfile.each_line do | line |
       if line =~ /^(\d\d:)\d\d:\d\d[,]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[,]\d\d\d/
         type = "srt"
-      elsif line =~ /(^(\d\d:)\d\d:\d\d[.]\d\d\d.*-->.*(\d\d:)\d\d:\d\d[.]\d\d\d)|(^WEBVTT$)/
+      elsif line =~ /^((\d\d:)+\d\d[.,]\d\d\d)\s-->\s((\d\d:)+\d\d[.,]\d\d\d)|(^WEBVTT$)/
         type = "vtt"
       elsif line =~ /(^\d\d:\d\d:\d\d:\d\d\t(([0-9a-fA-F]{4})\s)*)+|(^Scenarist_SCC V(\d.\d)$)/
         type = "scc"
@@ -62,6 +65,11 @@ class Subtitle
   end
 
   private
+
+  def initialize_handler(options)
+    translator = get_translator(options)
+    @handler = get_caption_handler(options, translator)
+  end
 
   def get_translator(options)
     translator = nil
@@ -93,24 +101,26 @@ class Subtitle
   def get_caption_handler(options, translator)
     caption_file = options[:cc_file]
     extension = File.extname(caption_file)
+    extension = ".#{type}" unless extension.nil?
     unless AllFather::VALID_FILES.include?(extension)
       raise "Caption support for #{caption_file} of type #{extension} is not supported yet" 
     end
     handler = nil
     case extension.downcase
     when ".scc"
-      handler = SCC.new(caption_file, translator)
+      handler = SCC.new(caption_file)
     when ".srt"
-      handler = SRT.new(caption_file, translator)
+      handler = SRT.new(caption_file)
     when ".vtt"
-      handler = VTT.new(caption_file, translator)
+      handler = VTT.new(caption_file)
     when ".ttml"
-      handler = TTML.new(caption_file, translator, {:force_detect => options[:force_detect]})
+      handler = TTML.new(caption_file)
     when ".dfxp"
-      handler = DFXP.new(caption_file, translator, {:force_detect => options[:force_detect]})
+      handler = DFXP.new(caption_file)
     else
       raise "Cannot handle file type .#{extension}"
     end
+    handler.set_translator(translator)
     handler
   end
 end

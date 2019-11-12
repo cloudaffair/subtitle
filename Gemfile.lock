@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    subtitle (0.2.5)
+    subtitle (0.2.6)
       nokogiri (= 1.10.4)
 
 GEM
@@ -19,8 +19,10 @@ GEM
       aws-eventstream (~> 1.0, >= 1.0.2)
     jmespath (1.4.0)
     mini_portile2 (2.4.0)
+    minitest (5.13.0)
     nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
+    optimist (3.0.0)
     rake (10.5.0)
 
 PLATFORMS
@@ -29,6 +31,8 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk (~> 2.11)
   bundler (~> 2.0)
+  minitest
+  optimist
   rake (~> 10.0)
   subtitle!
 

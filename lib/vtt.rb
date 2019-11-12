@@ -16,10 +16,13 @@ class VTT
 
   SUPPORTED_TRANSFORMATIONS = [TYPE_SCC, TYPE_SRT, TYPE_TTML, TYPE_DFXP]
 
-  def initialize(cc_file, translator)
+  def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
     raise "Invalid VTT file provided" unless is_valid?
+  end
+
+  def set_translator(translator)
+    @translator = translator
   end
 
   def translate(src_lang, dest_lang, out_file)
@@ -30,7 +33,7 @@ class VTT
       text_collection = false
       text_sample = ""
       ccfile.each_line do | line |
-        if line =~ /^[\d\d:]?\d\d:\d\d[,.]\d\d\d.*-->.*[\d\d:]?\d\d:\d\d[,.]\d\d\d/
+        if line =~ /^((\d\d:)+\d\d[.,]\d\d\d)\s-->\s((\d\d:)+\d\d[.,]\d\d\d)/
           text_collection = true
           outfile.puts line
         elsif line.strip.empty? && !text_sample.empty?
@@ -166,7 +169,7 @@ class VTT
       text_collection = false
       text_sample = ""
       ccfile.each_line do |line|
-        if line =~ /^[\d\d:]?\d\d:\d\d[,.]\d\d\d.*-->.*[\d\d:]?\d\d:\d\d[,.]\d\d\d/
+        if line =~ /^((\d\d:)+\d\d[.,]\d\d\d)\s-->\s((\d\d:)+\d\d[.,]\d\d\d)/
           text_collection = true
         elsif line.strip.empty?
           text_collection = false

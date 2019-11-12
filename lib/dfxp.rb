@@ -10,10 +10,10 @@ require_relative "ttml"
 #
 class DFXP < TTML
 
-	def initialize(cc_file, translator, opts={})
+	def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
-    @force_detect = opts[:force_detect] || false
+    #@translator = translator
+    #@force_detect = opts[:force_detect] || false
     raise "Invalid TTML file provided" unless is_valid?
   end
 

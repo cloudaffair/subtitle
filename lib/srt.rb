@@ -16,9 +16,8 @@ class SRT
 
   SUPPORTED_TRANSFORMATIONS = [TYPE_SCC, TYPE_VTT, TYPE_TTML, TYPE_DFXP]
 
-  def initialize(cc_file, translator)
+  def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
     raise "Invalid SRT file provided" unless is_valid?
   end
 
@@ -28,6 +27,10 @@ class SRT
       return true
     end
     return false
+  end
+
+  def set_translator(translator)
+    @translator = translator
   end
 
   def translate(src_lang, dest_lang, out_file)

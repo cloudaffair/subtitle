@@ -19,15 +19,15 @@ Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc
 cmd = ARGV.shift # get the subcommand
 cmd_opts = case cmd
              when "detectlang" # parse detectlang options
-               subtitle = Subtitle.new(global_opts)
-               puts subtitle.detect_language
+               subtitle = Subtitle.new(global_opts[:cc_file])
+               puts subtitle.detect_language(global_opts)
              when "translate"  # parse translate options
                if global_opts[:dest_lang].nil?
                  puts "Need to provide destination language code option[-f] missing"
                  exit 1
                end
-               subtitle = Subtitle.new(global_opts)
-               puts subtitle.translate(global_opts[:dest_lang], global_opts[:src_lang], global_opts[:outfile])
+               subtitle = Subtitle.new(global_opts[:cc_file])
+               puts subtitle.translate(global_opts[:dest_lang], global_opts[:src_lang], global_opts[:outfile], global_opts)
              else
                Optimist::die "unknown subcommand #{cmd.inspect}"
            end
