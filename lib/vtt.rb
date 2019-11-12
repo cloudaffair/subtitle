@@ -22,6 +22,7 @@ class VTT
   end
 
   def set_translator(translator)
+    super(translator)
     @translator = translator
   end
 
@@ -61,7 +62,6 @@ class VTT
         outfile.puts
       end
     ensure
-      ccfile.close rescue nil
       outfile.close
     end
   end

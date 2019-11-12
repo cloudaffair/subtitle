@@ -1,4 +1,5 @@
 require 'fileutils'
+require_relative "engines/translator"
 
 # 
 # A Module that kind of acts as an interface where the generic methods
@@ -54,6 +55,18 @@ module AllFather
   # 
   def infer_languages
     raise "Not Implemented. Class #{self.class.name} doesn't implement infer_languages"
+  end
+
+
+  # 
+  # Method to set a translation engine
+  #
+  # * +translator+  - Instance of translation engine. Refer to `engines/aws` for example
+  #
+  def set_translator(translator)
+    if translator && !(translator.is_a? Translator)
+      raise "Argument is not an instance of Translator"
+    end
   end
 
   #
@@ -123,7 +136,7 @@ module AllFather
     end
     # Basic validations
     if types.include?(TYPE_SCC)
-      unless target_lang.eql?("en")
+      if target_lang && !target_lang.eql?("en")
         raise InvalidInputException.new("SCC can be generated only in en. #{target_lang} is unsupported")
       end
     end

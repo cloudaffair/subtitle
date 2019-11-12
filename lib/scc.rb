@@ -30,6 +30,7 @@ class SCC
   end
 
   def set_translator(translator)
+    super(translator)
     @translator = translator
   end
 

@@ -30,6 +30,7 @@ class SRT
   end
 
   def set_translator(translator)
+    super(translator)
     @translator = translator
   end
 
@@ -68,7 +69,6 @@ class SRT
         outfile.puts
       end
     ensure
-      ccfile.close rescue nil
       outfile.close
     end
   end

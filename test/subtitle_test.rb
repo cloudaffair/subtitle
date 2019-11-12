@@ -14,22 +14,33 @@ global_opts = Optimist::options do
   opt :src_lang, "Source language", :type => :string, :short => "l"
   opt :outfile, "Destination file / directory", :type => :string, :short => "f"
   opt :force_detect, "Will try to infer the language even if language is provided. By default false if not provided", :type => :boolean, :short => "w", :default => false
+  opt :types, "comma seperated lowercase formats to convert to. valid values are srt, scc, vtt, ttml and dfxp", :type=>:string, :short => "t"
 end
 Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc_file]) if global_opts[:cc_file]
 cmd = ARGV.shift # get the subcommand
 cmd_opts = case cmd
-             when "detectlang" # parse detectlang options
-               subtitle = Subtitle.new(global_opts[:cc_file])
-               puts subtitle.detect_language(global_opts)
-             when "translate"  # parse translate options
-               if global_opts[:dest_lang].nil?
-                 puts "Need to provide destination language code option[-f] missing"
-                 exit 1
-               end
-               subtitle = Subtitle.new(global_opts[:cc_file])
-               puts subtitle.translate(global_opts[:dest_lang], global_opts[:src_lang], global_opts[:outfile], global_opts)
-             else
-               Optimist::die "unknown subcommand #{cmd.inspect}"
+              when "detectlang" # parse detectlang options
+                subtitle = Subtitle.new(global_opts[:cc_file])
+                puts subtitle.detect_language(global_opts)
+              when "translate"  # parse translate options
+                if global_opts[:dest_lang].nil?
+                  puts "Need to provide destination language code option[-d] missing"
+                  exit 1
+                end
+                subtitle = Subtitle.new(global_opts[:cc_file])
+                subtitle.translate(global_opts[:dest_lang], global_opts[:src_lang], global_opts[:outfile], global_opts)
+              when "transform" # parse transform options
+                if global_opts[:outfile].nil? || global_opts[:types].nil?
+                  puts "Need to provide destination location using option[-f] & types using option[-t]"
+                  exit 1
+                end
+                subtitle = Subtitle.new(global_opts[:cc_file])
+                type_values = global_opts[:types]
+                types = type_values.split(",")
+                # strip any leading and trailing spaces
+                types = types.map {|x| x.strip}
+                subtitle.transform(types, global_opts[:src_lang], global_opts[:dest_lang], global_opts)
+              else
+                Optimist::die "unknown subcommand #{cmd.inspect}"
            end
-
 
