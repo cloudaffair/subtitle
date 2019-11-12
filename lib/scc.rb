@@ -11,9 +11,8 @@ class SCC
 
   include AllFather
 
-  def initialize(cc_file, translator)
+  def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
     raise "Invalid SCC file provided" unless is_valid?
   end
 
@@ -23,6 +22,10 @@ class SCC
       return true
     end
     return false
+  end
+
+  def set_translator(translator)
+    @translator = translator
   end
 
   def infer_languages

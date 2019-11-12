@@ -13,10 +13,8 @@ class TTML
 
   include AllFather
 
-  def initialize(cc_file, translator, opts={})
+  def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
-    @force_detect = opts[:force_detect] || false
     raise "Invalid TTML file provided" unless is_valid?
   end
 
@@ -30,7 +28,12 @@ class TTML
     return false
   end
 
+  def set_translator(translator)
+    @translator = translator
+  end
+
   def infer_languages
+    force_detect =  false
     lang = []
     begin
       xml_file = File.open(@cc_file)
@@ -43,9 +46,9 @@ class TTML
         if inferred_lang.nil?
           # If lang is not provided in the caption, then override
           # force detect for inferrence
-          @force_detect = true
+          force_detect = true
         end
-        if @force_detect
+        if force_detect
           sample_text = get_text(div, 100)
           inferred_lang = @translator.infer_language(sample_text) rescue nil
           if inferred_lang.nil?

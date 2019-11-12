@@ -11,10 +11,13 @@ class VTT
 
   include AllFather
 
-  def initialize(cc_file, translator)
+  def initialize(cc_file)
     @cc_file = cc_file
-    @translator = translator
     raise "Invalid VTT file provided" unless is_valid?
+  end
+
+  def set_translator(translator)
+    @translator = translator
   end
 
   def translate(src_lang, dest_lang, out_file)
