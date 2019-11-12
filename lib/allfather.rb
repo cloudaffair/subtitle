@@ -127,6 +127,9 @@ module AllFather
         raise InvalidInputException.new("SCC can be generated only in en. #{target_lang} is unsupported")
       end
     end
+    if target_lang && !target_lang.empty?
+      raise InvalidInputException.new("Translation to other language as part of transform is yet to be implemented")
+    end
   end
 
   # 

@@ -1,5 +1,4 @@
 require_relative "../allfather"
-require_relative "../scc"
 require "nokogiri"
 
 module CommonUtils
@@ -105,8 +104,36 @@ module CommonUtils
   end
 
   #
+  # Method to encode a text to SCC format
+  #
+  # * +free_text+ - Text that needs to be encoded
+  #
+  # ===== Returns
+  # The encoded string that can be added to SCC file
+  #
+  def scc_encode(free_text)
+    encoded_str = ""
+    count = 0
+    free_text.each_byte do |char|
+      count += 1
+      binval = char.to_s(2).count("1") % 2 == 0 ? (char.to_i | 128 ).to_s(2) : char.to_s(2)
+      encode_char = binval.to_i(2).to_s(16)
+      if ((count > 0) && (count % 2 == 0))
+        encoded_str << encode_char << " "
+      else
+        encoded_str << encode_char
+      end
+    end
+    encoded_str
+  end
+
+  #
   # Method to return the cue info of the caption based on the model
   # and target caption type which can be used by the caller's transformation routine
+  #
+  # * +model+         - `CueInfo` instance which is caption agnostic details of a cue
+  # * +target_type+   - The target type to which the new cue is to be generated 
+  # * +last_cue+      - true for last cue and false otherwise.
   #
   def new_cue(model, target_type, last_cue = false)
     message = nil
@@ -119,9 +146,9 @@ module CommonUtils
       ms = start_unit[3]
       # Convert to Frames assuming a framerate of 23.976
       # Pad 0 if frames is <= 9
-      frames = ((ms.to_f * SCC_DEFAULT_FRAME_RATE) / 1000.0).to_i.to_s.rjust(2, "0")
+      frames = ((ms.to_f * SCC_DEFAULT_FRAME_RATE) / 1000.0).to_i.to_s.rjust(2, "0").to_i
       # TODO: Might have to strip off non-english characters here
-      message = "#{h}:#{m}:#{s}:#{frames} " + SCC.encode(model.message)
+      message = "#{h}:#{m}:#{s}:#{frames} " + scc_encode(model.message)
     when AllFather::TYPE_VTT, AllFather::TYPE_SRT
       start_unit = model.start_time_units
       end_unit = model.end_time_units
@@ -153,6 +180,7 @@ module CommonUtils
       message << "\n"
       message << model.message
       message << "\n"
+      message << "\n" unless model.message.end_with?("\n")
     when AllFather::TYPE_TTML, AllFather::TYPE_DFXP
       start_unit = model.start_time_units
       end_unit = model.end_time_units
@@ -174,6 +202,13 @@ module CommonUtils
     message
   end
 
+  #
+  # Method that normalizes the timestamps from various different caption formats into 
+  # a caption agnostic format
+  #
+  # * +time_stamp+  - The timestamp parsed from the caption file for a given caption type
+  # * +type+        - A valid caption type. Refer to `AllFather` for valid types
+  #
   def time_details(time_stamp, type)
     h = m = s = ms = nil
     elapsed_seconds = nil
@@ -183,7 +218,11 @@ module CommonUtils
       h = tokens[0].to_i
       m = tokens[1].to_i
       s = tokens[2].to_i
-      ms = tokens[3].to_i
+      frames = tokens[3].to_i
+      ms = (frames * 1000 / SCC_DEFAULT_FRAME_RATE).round(0).to_s.rjust(3, "0").to_i
+      if ms >= 1000
+        ms = 999
+      end
     when AllFather::TYPE_SRT
       tokens = time_stamp.split(",")
       ms = tokens[1].to_i
@@ -262,6 +301,14 @@ module CommonUtils
     return [h, m, s, ms, elapsed_seconds]
   end
 
+
+  # 
+  # Method to write the cue details to the output files
+  #
+  # * +model+     - Cue instance
+  # * +file_map+  - Hash of files for each caption type
+  # * +last_cue+  - true for last cue and false otherwise
+  #  
   def write_cue(model, file_map, last_cue = false)
     file_map.each do |type, file_path|
       File.open(file_path, "a") do |f|

@@ -1,4 +1,6 @@
 require_relative "engines/translator"
+require_relative "utils/common_utils"
+require_relative "utils/cue_info"
 require_relative "allfather"
 
 #
@@ -10,6 +12,9 @@ require_relative "allfather"
 class SCC
 
   include AllFather
+  include CommonUtils
+
+  SUPPORTED_TRANSFORMATIONS = [TYPE_SRT, TYPE_VTT, TYPE_TTML, TYPE_DFXP]
 
   def initialize(cc_file, translator)
     @cc_file = cc_file
@@ -38,6 +43,71 @@ class SCC
 
   def translate(src_lang, dest_lang, out_file)
     raise "Not Implemented. Class #{self.class.name} doesn't implement translate yet !!"
+  end
+
+  def supported_transformations
+    return SUPPORTED_TRANSFORMATIONS
+  end
+
+  def transform_to(types, src_lang, target_lang, output_dir)
+    # Let's start off with some validations
+    super(types, src_lang, target_lang, output_dir)
+
+    # Suffix output dir with File seperator
+    output_dir = "#{output_dir}#{File::Separator}" unless output_dir.end_with?(File::Separator)
+    
+    # Prepare the output files for each type
+    file_map = {}
+    types.each do |type|
+      output_file = File.basename(@cc_file, File.extname(@cc_file)) + extension_from_type(type)
+      out_file = "#{output_dir}#{output_file}"
+      if create_file(type, out_file, target_lang)
+        file_map[type] = out_file
+      else
+        raise StandardError.new("Failed to create output file for type #{type}")
+      end
+    end
+
+    # Read the file and prepare the cue model
+    prev_cue_info = cur_cue_info = nil
+    ccfile = File.open(@cc_file, 'r:UTF-8', &:read)
+    cue_index = 1
+    ccfile.each_line do | line |
+      time_point = line.scan(/(^\d\d:\d\d:\d\d:\d\d\s)(.*)/)
+      unless time_point.empty?
+        scc_text_code = time_point[0][1].strip
+        message = decode(scc_text_code)
+        # Replace \u0000 with empty as this causes the ttml / dfxp outputs
+        # to treat them as end and terminates the xml the moment this is encountered
+        # https://github.com/sparklemotion/nokogiri/issues/1535
+        message = message.gsub(/\u0000/, '')
+        if prev_cue_info.nil?
+          prev_cue_info = CueInfo.new(TYPE_SCC)
+          prev_cue_info.index = cue_index
+          prev_cue_info.message = message
+          prev_cue_info.start = time_point[0][0].strip
+        else
+          cur_cue_info = CueInfo.new(TYPE_SCC)
+          cur_cue_info.index = cue_index
+          cur_cue_info.message = message
+          cur_cue_info.start = time_point[0][0].strip
+          # Set the previous cue info's end time to current cue's start time
+          # TODO: Need to see if we need to reduce alteast 1 fps or 1s
+          prev_cue_info.end = cur_cue_info.start
+          prev_cue_info.start_time_units = time_details(prev_cue_info.start, TYPE_SCC)
+          prev_cue_info.end_time_units = time_details(prev_cue_info.end, TYPE_SCC)
+          write_cue(prev_cue_info, file_map)
+          prev_cue_info = cur_cue_info
+        end
+        cue_index += 1
+      end
+    end
+    # we need to set some end time, but don't know the same !!
+    # for now setting the start time itself
+    cur_cue_info.end = cur_cue_info.start 
+    cur_cue_info.start_time_units = time_details(cur_cue_info.start, TYPE_SCC)
+    cur_cue_info.end_time_units = time_details(cur_cue_info.end, TYPE_SCC)
+    write_cue(cur_cue_info, file_map, true)
   end
 
   private
@@ -77,21 +147,5 @@ class SCC
       decoded_text << dec_val.chr
     end
     decoded_text
-  end
-
-  def self.encode(free_text)
-    encoded_str = ""
-    count = 0
-    free_text.each_byte do |char|
-      count += 1
-      binval = char.to_s(2).count("1") % 2 == 0 ? (char.to_i | 128 ).to_s(2) : char.to_s(2)
-      encode_char = binval.to_i(2).to_s(16)
-      if ((count > 0) && (count % 2 == 0))
-        encoded_str << encode_char << " "
-      else
-        encoded_str << encode_char
-      end
-    end
-    encoded_str
   end
 end
