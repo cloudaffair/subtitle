@@ -157,4 +157,18 @@ module AllFather
   def supported_transformations
     raise "Not Implemented. Class #{self.class.name} doesn't implement supported_transformations"
   end
+
+  #
+  # While the logic of abstracting stuff to callers has it's benefits, sometimes it's required
+  # to identify which instance are we specifically operate on. This method returns the instance
+  # currently being operated on and returns one of the +TYPE_+ constants defined here
+  # Implement this unless and absolutely it's necessary and there is no other easy way to do things 
+  #
+  # ===== Returns
+  #
+  # * the call sign of the instance
+  #
+  def callsign
+    raise "Not Implemented. Class #{self.class.name} doesn't implement callsign"
+  end
 end

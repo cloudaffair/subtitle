@@ -1,4 +1,6 @@
 require_relative "engines/translator"
+require_relative "utils/common_utils"
+require_relative "utils/cue_info"
 require_relative "allfather"
 
 require "nokogiri"
@@ -12,10 +14,18 @@ require "nokogiri"
 class TTML
 
   include AllFather
+  include CommonUtils
 
-  def initialize(cc_file)
+  SUPPORTED_TRANSFORMATIONS = [TYPE_SCC, TYPE_SRT, TYPE_VTT, TYPE_DFXP]
+
+  def initialize(cc_file, opts=nil)
     @cc_file = cc_file
+    @force_detect = opts[:force_detect] || false
     raise "Invalid TTML file provided" unless is_valid?
+  end
+
+  def callsign
+    TYPE_TTML
   end
 
   def is_valid?
@@ -33,12 +43,12 @@ class TTML
   end
 
   def infer_languages
-    force_detect =  false
     lang = []
     begin
       xml_file = File.open(@cc_file)
       xml_doc  = Nokogiri::XML(xml_file)
       div_objects = xml_doc.css("/tt/body/div")
+      local_force_detect = false
       div_objects.each_with_index do |div, index|
         # By default, return the lang if specified in the div and 
         # force detect is false
@@ -46,9 +56,10 @@ class TTML
         if inferred_lang.nil?
           # If lang is not provided in the caption, then override
           # force detect for inferrence
-          force_detect = true
+          local_force_detect = true
         end
-        if force_detect
+        if @force_detect || local_force_detect
+          local_force_detect = false
           sample_text = get_text(div, 100)
           inferred_lang = @translator.infer_language(sample_text) rescue nil
           if inferred_lang.nil?
@@ -113,6 +124,110 @@ class TTML
     xml_file.close rescue nil
     File.write(out_file, xml_doc)
     out_file
+  end
+
+  def supported_transformations
+    return SUPPORTED_TRANSFORMATIONS
+  end
+
+  def transform_to(types, src_lang, target_lang, output_dir)
+    # Let's start off with some validations
+    super(types, src_lang, target_lang, output_dir)
+
+    # Suffix output dir with File seperator
+    output_dir = "#{output_dir}#{File::Separator}" unless output_dir.end_with?(File::Separator)
+    
+    # Prepare the output files for each type and for each lang in the file
+    begin
+      xml_file = File.open(@cc_file, 'r')
+      xml_doc = Nokogiri::XML(xml_file)
+      div_objects = xml_doc.css("/tt/body/div")
+      langs = div_objects.map {|div| div.attributes['lang'].value rescue nil}
+
+      matching_divs = []
+      if src_lang.nil? || src_lang.empty?
+        # Then we will have to create output files for each lang
+        matching_divs = div_objects
+      else
+        # Find the matching lang div and create the outputs
+        unless langs.include?(src_lang)
+          raise InvalidInputException.new("Given Caption file #{@cc_file} doesn't contain #{src_lang} lang. Available langs are #{langs}")
+        end
+        available_divs = langs.select { |lang| lang.eql?(src_lang) }
+        if available_divs.length > 1
+          raise InvalidInputException.new("More than one section in Caption file specifies lang as #{src_lang}. This file is unsupported")
+        end
+        div_objects.each_with_index do |div, j|
+          lang = div.attributes['lang'].value rescue nil
+          if lang.nil?
+            # Let's infer the lang
+            if @translator.nil?
+              raise StandardError.new("Cannot infer language as engine options are not provided")
+            end
+            reference_text = get_text(div, 100)
+            inferred_lang = @translator.infer_language(reference_text) rescue nil
+            if inferred_lang.nil?
+              raise LangDetectionFailureException.new("Failed to infer language for div block #{j} of caption file")
+            end
+            if inferred_lang.eql?(src_lang)
+              matching_divs << div 
+            end
+          elsif lang.eql?(src_lang)
+            matching_divs << div
+          end
+        end
+      end
+
+      div_index = 1
+      multiple_outputs = matching_divs.size > 1
+      matching_divs.each do |div|
+        div_lang = div.attributes['lang'].value rescue nil
+        file_map = {}
+        types.each do |type|
+          output_file = File.basename(@cc_file, File.extname(@cc_file))
+          # Suffix div index when multiple outputs are created
+          output_file << "_#{div_index}" if multiple_outputs
+          # Suffix lang to filename if provideds 
+          if target_lang && !target_lang.empty?
+            output_file << "_#{target_lang}"
+          end
+          output_file << extension_from_type(type)
+          
+          out_file = "#{output_dir}#{output_file}"
+          if create_file(TYPE_TTML, type, out_file, div_lang)
+            file_map[type] = out_file
+          else
+            raise StandardError.new("Failed to create output file for type #{type}")
+          end
+        end
+        blocks = div.css("p")
+        cue_index = 1
+        total_blocks = blocks.size
+        blocks.each_with_index do |block, index|
+          start_time = block.attributes['begin'].value
+          end_time = block.attributes['end'].value
+          text = block.inner_html.strip.gsub(/(\s){2,}/, '')
+          message = ""
+          text_blocks = get_block_text(text)
+          text_blocks.each do |text_block|
+            next if text_block.start_with?('<') || text_block.empty?
+            message = text_block
+          end
+          cue_info = CueInfo.new(callsign)
+          cue_info.index = cue_index
+          cue_index += 1
+          cue_info.message = message
+          cue_info.start = start_time
+          cue_info.end = end_time
+          cue_info.start_time_units = time_details(start_time, callsign)
+          cue_info.end_time_units = time_details(end_time, callsign)
+          write_cue(cue_info, file_map, index == (total_blocks - 1))
+        end
+        div_index += 1
+      end
+    ensure
+      xml_file.close if xml_file
+    end
   end
 
   private
