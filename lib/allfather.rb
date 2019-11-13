@@ -63,16 +63,17 @@ module AllFather
   #
   # * +translator+  - Instance of translation engine. Refer to `engines/aws` for example
   #
+  # ==== Raises
+  # * `InvalidInputException` when the argument `translator` is not an instance of Translator class
+  #
   def set_translator(translator)
     if translator && !(translator.is_a? Translator)
-      raise "Argument is not an instance of Translator"
+      raise InvalidInputException.new("Argument is not an instance of Translator")
     end
   end
 
   #
   # Method to translate the caption from one language to another
-  #
-  # :args: src_lang, target_lang, output_file
   #
   # * +src_lang+        - can be inferred using #infer_language method
   # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
@@ -149,7 +150,9 @@ module AllFather
   # Method to report on the supported transformations. Each implementor is free to return
   # the types to which it can convert itself to
   #
-  # Returns an array of one or more types defined as +TYPE_+ constants here 
+  # ==== Returns 
+  # 
+  # * An array of one or more types defined as +TYPE_+ constants here 
   #
   def supported_transformations
     raise "Not Implemented. Class #{self.class.name} doesn't implement supported_transformations"

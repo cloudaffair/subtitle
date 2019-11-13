@@ -11,8 +11,8 @@ require_relative 'translator'
 #
 # * [Arguments]             - Pass the credentials access_key_id and secret_access_key as arguments
 # * [Environment route]     - AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY can be exposed as environment variables
-# * [Profile Name]          - The application uses the credentials of the system and picks the
-#  credentials referred to by the profile
+# * [Profile Name]          - The application uses the credentials of the system and picks the credentials 
+#                             referred to by the profile
 #
 class AwsEngine
   include Translator
