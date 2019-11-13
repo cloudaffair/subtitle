@@ -56,20 +56,26 @@ Or install it yourself as:
 ```ruby
 require 'subtitle'
 
+### Two Ways of Initialisation
+
+Option - 1
+You can use below method of initialisation in case you intend to use only transformation functionality.
+
+subtitle = Subtitle.new(caption_file_path)
+
+Option - 2
+In case you need to use Subtitle Gem for detecting / translating subtitle, then use below way of initialisation
+
 subtitle = Subtitle.new(caption_file_path, options)
 
+end
 where options is a hash with following keys at the minimal
 <access_key_id>             : AWS Key
 <secret_access_key>         : AWS Secret
 <profile>[Optional]         : AWS Profile (If this is provided key and secret is not required)
 <force_detect>[Optional]    : By default false. If this is true then, even if the caption file declares the language
                               we will try to infer the language. If it's false, the declared language would be returned. 
-                              Is applicable only when subtile format encapsulates the language information.
-<dest_lang>					: ISO 639-2 2 Letter language code to which a caption needs to be tranlated to 
-<src_lang>					: Applicable in case if the input caption can hold cues for multiple languages, in which case 
-							  the content with the matching language is picked. If not provided language will be auto detected
-<outfile>					: The destination directory in case of transform and is optional file path for language translation
-<types>						: Comma seperated strings that indicates the types to which the input caption file needs to be transformed into. For example, dfxp,ttml,srt					
+                              Is applicable only when Subtile format encapsulates the language information.
 ```
 
 ## Detect Language
@@ -96,9 +102,13 @@ Option 2
 
 subtitle.translate(<dest_lang>, <src_lang>)
 
+# Creates file following the convention `caption_file_path`_`dest_lang`
+
 Option 3
 
 subtitle.translate(<dest_lang>)
+
+# Detects the source langauge and creates the out file using convention `caption_file_path`_`dest_lang`
 
 <dest_lang>   : Provide translate Language code (ISO639 2 Letter Code)
 <src_lang>    : Provide  source Language code (ISO639 2 Letter Code). If not supplied, the source language will be auto detected.
@@ -109,7 +119,7 @@ subtitle.translate(<dest_lang>)
 ```ruby
 require 'subtitle'
 
-subtitle = Subtitle.new(options)
+subtitle = Subtitle.new(caption_file_path)
  
 # in case the <cc_file> is supplied with subtitle type SRT and the file name does not hold extension.
 
@@ -129,6 +139,7 @@ Returned values
 require 'subtitle'
 
 subtitle = Subtitle.new(caption_file_path)
+
 subtitle.transform(types_to_convert, src_lang, target_lang, options)
 
 <types_to_convert>  : An array that can hold any of the following values (dfxp, ttml, srt, vtt, scc)
