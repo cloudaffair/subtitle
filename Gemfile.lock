@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    subtitle (0.2.6)
+    subtitle (0.3.0)
       nokogiri (= 1.10.4)
 
 GEM

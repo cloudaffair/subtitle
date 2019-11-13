@@ -7,16 +7,21 @@ require_relative "allfather"
 require_relative "engines/translator"
 require_relative "engines/aws"
 
-
+#
+# Facade that wraps all the complexities surrounding which translation
+# engine to use or which caption instances to be instantiated.
+# 
 class Subtitle
+
+  TYPE_MAP = {"scc" => AllFather::TYPE_SCC, "srt" => AllFather::TYPE_SRT, "vtt" => AllFather::TYPE_VTT, 
+              "ttml" => AllFather::TYPE_TTML, "dfxp" => AllFather::TYPE_DFXP}
+
   def initialize(file, options = nil)
     # Infer the caption handler from the extension
     @cc_file = file
     raise "Input caption not provided. Please provide the same in :cc_file option" if @cc_file.nil?
-    initialize_handler(options) unless  options.nil?
+    initialize_handler(options) unless options.nil?
   end
-
-
 
   def detect_language(options = nil)
     initialize_handler(options) if @handler.nil?
@@ -24,7 +29,7 @@ class Subtitle
   end
 
   def translate(dest_lang, src_lang = nil, outfile = nil, options = nil)
-    initialize_handler(options) unless  @handler.nil?
+    initialize_handler(options) if @handler.nil?
     if outfile.nil?
       outfile = "#{@cc_file}_#{dest_lang}"
     end
@@ -34,6 +39,33 @@ class Subtitle
     end
     @handler.translate(src_lang, dest_lang, outfile)
     outfile
+  end
+
+  def transform(types, src_lang = nil, target_lang = nil, options = nil)
+    # A quick validation & translation to expected arguments
+    vals = []
+    invalid_vals = []
+    types.each do |type|
+      type_val = TYPE_MAP[type]
+      if type_val.nil?
+        invalid_vals << type
+        next
+      end
+      vals << type_val
+    end
+    unless invalid_vals.empty?
+      raise "Invalid types #{invalid_vals} provided"
+    end
+    # Translator not required if target_lang is nil
+    if @handler.nil?
+      if target_lang.nil?
+        @handler = get_caption_handler(options, nil) 
+      else
+        initialize_handler(options)
+      end
+    end
+    output_dir = options[:outfile]
+    @handler.transform_to(vals, src_lang, target_lang, output_dir)
   end
 
   def type
@@ -101,7 +133,7 @@ class Subtitle
   def get_caption_handler(options, translator)
     caption_file = options[:cc_file]
     extension = File.extname(caption_file)
-    extension = ".#{type}" unless extension.nil?
+    extension = ".#{type}" if extension.nil?
     unless AllFather::VALID_FILES.include?(extension)
       raise "Caption support for #{caption_file} of type #{extension} is not supported yet" 
     end
