@@ -9,7 +9,7 @@ Welcome to `subtitle` gem!. Following functionalities are provided using AWS ser
 * Detect the Language code for the given Subtitle file
 * Translates the given subtitle file to required suggested language.
 * Auto detects the type of subtitle in case no extension to the file provided.
-* Convert from one format to another. Currently scc, vtt, srt can be converted to other formats (Refer below for supported formats)
+* Convert from one caption format to another. Refer below for supported formats
 
 Supports following subtitle files
 
