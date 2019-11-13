@@ -14,7 +14,7 @@ class DFXP < TTML
 
 	def initialize(cc_file, opts=nil)
     @cc_file = cc_file
-    @force_detect = opts[:force_detect] || false
+    @force_detect = opts ? (opts[:force_detect] || false) : false
     raise "Invalid DFXP file provided" unless is_valid?
   end
 
