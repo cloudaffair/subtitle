@@ -115,6 +115,9 @@ module AllFather
   # If no target_lang is provided, no translations are applied. output_file is created using
   # without any need for any language translation services. Hence doesn't incur any cost !!
   #
+  # Note: +src_lang+ makes sense only for caption types that can hold multi lingual captions
+  # like dfxp and ttml. For other caption sources this field is ignored
+  #
   # * +types+           - An array of Valid input caption type(s). Refer to `#CaptionType`
   # * +src_lang+        - can be inferred using #infer_language method
   # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
@@ -140,9 +143,6 @@ module AllFather
       if target_lang && !target_lang.eql?("en")
         raise InvalidInputException.new("SCC can be generated only in en. #{target_lang} is unsupported")
       end
-    end
-    if target_lang && !target_lang.empty?
-      raise InvalidInputException.new("Translation to other language as part of transform is yet to be implemented")
     end
   end
 

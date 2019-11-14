@@ -94,11 +94,21 @@ class SRT
 
     # Suffix output dir with File seperator
     output_dir = "#{output_dir}#{File::Separator}" unless output_dir.end_with?(File::Separator)
+
+    translate = false
+    if target_lang && !target_lang.empty?
+      translate = true
+      if @translator.nil?
+        raise StandardError.new("Cannot infer language as engine options are not provided")
+      end
+    end
     
     # Prepare the output files for each type
     file_map = {}
     types.each do |type|
-      output_file = File.basename(@cc_file, File.extname(@cc_file)) + extension_from_type(type)
+      output_file = File.basename(@cc_file, File.extname(@cc_file))
+      output_file << "_#{target_lang}" if translate
+      output_file << extension_from_type(type)
       out_file = "#{output_dir}#{output_file}"
       if create_file(TYPE_SRT, type, out_file, target_lang)
         file_map[type] = out_file
@@ -119,7 +129,7 @@ class SRT
         # This is not a time point
         seq = line.strip
         if seq.to_i > 0
-          cue_info.message = message unless message.empty?
+          cue_info.message = translated_msg(translate, message, src_lang, target_lang) unless message.empty?
           write_cue(cue_info, file_map) if cue_info
           cue_info = CueInfo.new(TYPE_SRT)
           cue_info.sequence = seq
@@ -140,11 +150,41 @@ class SRT
         cue_info.end_time_units = end_units
       end
     end
-    cue_info.message = message unless message.empty?
+    cue_info.message = translated_msg(translate, message, src_lang, target_lang) unless message.empty?
     write_cue(cue_info, file_map, true)
   end
 
   private 
+
+  #
+  # Method to translate a given text message based on following conditions
+  #
+  # * If translate is false, the message is returned as is
+  # * If +src_lang+ and +target_lang+ are same then the message is returned as is
+  # * If +src_lang+ is nil or empty then this caption file will be inspected to infer language
+  #   and if it's same as target_lang, then again the message shall be returned as is
+  # * Otherwise, returns a translated text
+  #
+  # ==== Raise
+  # * LangDetectionFailureException - If failed to infer the language
+  #
+  def translated_msg(translate, message, src_lang, target_lang)
+    return message unless translate 
+    use_src = nil 
+    if (src_lang.nil? || src_lang.empty?)
+      # We don't need to infer again and again
+      begin
+        @inferred_src_lang ||= infer_languages.first
+      rescue StandardError => e 
+        raise LangDetectionFailureException.new("Failed to infer language due to #{e.message}")
+      end
+      use_src = @inferred_src_lang
+    else
+      use_src = src_lang
+    end
+    return message if use_src.eql?(target_lang)
+    @translator.translate(message, use_src, target_lang)
+  end
 
   # 
   # Method to get a minimal amount of key text that excludes any tags

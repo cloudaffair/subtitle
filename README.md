@@ -150,7 +150,7 @@ subtitle.transform(types_to_convert, src_lang, target_lang, options)
 
 <types_to_convert>  : An array that can hold any of the following values (dfxp, ttml, srt, vtt, scc)
 <src_lang>          : can be nil or can specify the lang code in case of ttml / dfxp to extract only that section of the caption for transformation
-<dest_lang>         : on the fly translation to this language (currently not supported)
+<dest_lang>         : on the fly translation to this language
 <options>           : Destination directory where the output files shall be placed
 
 ```

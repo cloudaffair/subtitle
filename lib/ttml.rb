@@ -137,44 +137,54 @@ class TTML
     # Suffix output dir with File seperator
     output_dir = "#{output_dir}#{File::Separator}" unless output_dir.end_with?(File::Separator)
     
-    # Prepare the output files for each type and for each lang in the file
     begin
       xml_file = File.open(@cc_file, 'r')
       xml_doc = Nokogiri::XML(xml_file)
       div_objects = xml_doc.css("/tt/body/div")
       langs = div_objects.map {|div| div.attributes['lang'].value rescue nil}
-
+      translate = false
       matching_divs = []
+      inferred_src_lang = nil
       if src_lang.nil? || src_lang.empty?
-        # Then we will have to create output files for each lang
-        matching_divs = div_objects
+        if target_lang && !target_lang.empty?
+          # Find if any of our div matches this. Else pick first and translate to target lang
+          div_objects.each_with_index do |div, j|
+            if matching_lang?(div, target_lang)
+              matching_divs << div 
+              break
+            end
+          end
+          if matching_divs.empty?
+            # Let's pick the first div for target translation
+            selected_div = div_objects.first
+            inferred_src_lang = selected_div.lang
+            matching_divs << selected_div
+            translate = true
+          end
+        else
+          # Then we will have to create output files for each lang
+          matching_divs = div_objects
+        end
       else
         # Find the matching lang div and create the outputs
-        unless langs.include?(src_lang)
-          raise InvalidInputException.new("Given Caption file #{@cc_file} doesn't contain #{src_lang} lang. Available langs are #{langs}")
-        end
         available_divs = langs.select { |lang| lang.eql?(src_lang) }
         if available_divs.length > 1
           raise InvalidInputException.new("More than one section in Caption file specifies lang as #{src_lang}. This file is unsupported")
         end
         div_objects.each_with_index do |div, j|
-          lang = div.attributes['lang'].value rescue nil
-          if lang.nil?
-            # Let's infer the lang
-            if @translator.nil?
-              raise StandardError.new("Cannot infer language as engine options are not provided")
-            end
-            reference_text = get_text(div, 100)
-            inferred_lang = @translator.infer_language(reference_text) rescue nil
-            if inferred_lang.nil?
-              raise LangDetectionFailureException.new("Failed to infer language for div block #{j} of caption file")
-            end
-            if inferred_lang.eql?(src_lang)
-              matching_divs << div 
-            end
-          elsif lang.eql?(src_lang)
-            matching_divs << div
+          if matching_lang?(div, src_lang)
+            matching_divs << div 
+            break
           end
+        end
+        if matching_divs.empty?
+          raise InvalidInputException.new("Given Caption file #{@cc_file} doesn't contain #{src_lang} lang. Available langs are #{langs}")
+        end
+        if matching_divs.length > 1
+          raise InvalidInputException.new("More than one section in Caption file specifies lang as #{src_lang}. This file is unsupported")
+        end
+        if target_lang && !target_lang.empty? && !src_lang.eql?(target_lang)
+          translate = true
         end
       end
 
@@ -182,17 +192,22 @@ class TTML
       multiple_outputs = matching_divs.size > 1
       matching_divs.each do |div|
         div_lang = div.attributes['lang'].value rescue nil
+        # Override div lang if translate is required
+        div_lang = target_lang if translate
         file_map = {}
+        # Prepare the output files for each type and for each lang in the file
         types.each do |type|
           output_file = File.basename(@cc_file, File.extname(@cc_file))
           # Suffix div index when multiple outputs are created
           output_file << "_#{div_index}" if multiple_outputs
+          if target_lang.nil? && !src_lang.nil?
+            output_file << "_#{src_lang}"
+          end
           # Suffix lang to filename if provideds 
           if target_lang && !target_lang.empty?
             output_file << "_#{target_lang}"
           end
           output_file << extension_from_type(type)
-          
           out_file = "#{output_dir}#{output_file}"
           if create_file(TYPE_TTML, type, out_file, div_lang)
             file_map[type] = out_file
@@ -211,12 +226,12 @@ class TTML
           text_blocks = get_block_text(text)
           text_blocks.each do |text_block|
             next if text_block.start_with?('<') || text_block.empty?
-            message = text_block
+            message << text_block
           end
           cue_info = CueInfo.new(callsign)
           cue_info.index = cue_index
           cue_index += 1
-          cue_info.message = message
+          cue_info.message = translated_msg(translate, message, src_lang, inferred_src_lang, target_lang)
           cue_info.start = start_time
           cue_info.end = end_time
           cue_info.start_time_units = time_details(start_time, callsign)
@@ -231,6 +246,44 @@ class TTML
   end
 
   private
+
+  def translated_msg(translate, message, src_lang, inferred_src_lang, target_lang)
+    return message unless translate 
+    use_src = nil 
+    if (src_lang.nil? || src_lang.empty?)
+      if inferred_src_lang.nil?
+        raise LangDetectionFailureException.new("Unable to deduce source lang for translation")
+      end
+      use_src = inferred_src_lang
+    else
+      use_src = src_lang
+    end
+    return message if use_src.eql?(target_lang)
+    @translator.translate(message, use_src, target_lang)
+  end
+
+  def matching_lang?(div, target_lang)
+    lang = div.attributes['lang'].value rescue nil
+    if lang.nil?
+      # Let's infer the lang
+      if @translator.nil?
+        raise StandardError.new("Cannot infer language as engine options are not provided")
+      end
+      reference_text = get_text(div, 100)
+      inferred_lang = @translator.infer_language(reference_text) rescue nil
+      if inferred_lang.nil?
+        raise LangDetectionFailureException.new("Failed to infer language for div block #{j} of caption file")
+      end
+      # Store this lang in the div
+      div.lang = inferred_lang
+      if inferred_lang.eql?(target_lang)
+        return true
+      end
+    elsif lang.eql?(target_lang)
+      return true
+    end
+    return false
+  end
 
   #
   # Method to segregate the data from markups as markups don't need
