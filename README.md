@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/subtitle.svg)](https://badge.fury.io/rb/subtitle)
 [![Build Status](https://travis-ci.org/cloudaffair/subtitle.svg?branch=master)](https://travis-ci.org/cloudaffair/subtitle)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](pgmaheshwaran@gmail.com)
 
 Welcome to `subtitle` gem!. Following functionalities are provided using AWS services.
 
