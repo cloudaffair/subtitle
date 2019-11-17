@@ -9,7 +9,7 @@ Welcome to `subtitle` gem!. Following functionalities are provided using AWS ser
 * Detect the Language code for the given Subtitle file
 * Translates the given subtitle file to required suggested language.
 * Auto detects the type of subtitle in case no extension to the file provided.
-* Convert from one format to another. Currently scc, vtt, srt can be converted to other formats (Refer below for supported formats)
+* Convert from one caption format to another. Refer below for supported formats
 
 Supports following subtitle files
 
@@ -74,8 +74,11 @@ where options is a hash with following keys at the minimal
 <secret_access_key>         : AWS Secret
 <profile>[Optional]         : AWS Profile (If this is provided key and secret is not required)
 <force_detect>[Optional]    : By default false. If this is true then, even if the caption file declares the language
-                              we will try to infer the language. If it's false, the declared language would be returned. 
-                              Is applicable only when Subtile format encapsulates the language information.
+                              we will try to infer the language. If it's false, the declared language would be returned. Is applicable only when subtile format encapsulates the language information.
+<dest_lang>                 : ISO 639-2 2 Letter language code to which a caption needs to be tranlated to 
+<src_lang>                  : Applicable in case if the input caption can hold cues for multiple languages, in which case the content with the matching language is picked. If not provided language will be auto detected
+<outfile>                   : The destination directory in case of transform and is optional file path for language translation
+<types>                     : Comma seperated strings that indicates the types to which the input caption file needs to be transformed into. For example, dfxp,ttml,srt
 ```
 
 ## Detect Language
@@ -84,6 +87,9 @@ require 'subtitle'
 
 subtitle = Subtitle.new(caption_file_path, options)
 subtitle.detect_language
+
+# By default, for TTML and DFXP files if the div contains the lang then the same would be returned
+# However, you can override this behavior using force_detect option
 ```
 
 ## Translate Closed caption file to desired langauge
@@ -144,7 +150,7 @@ subtitle.transform(types_to_convert, src_lang, target_lang, options)
 
 <types_to_convert>  : An array that can hold any of the following values (dfxp, ttml, srt, vtt, scc)
 <src_lang>          : can be nil or can specify the lang code in case of ttml / dfxp to extract only that section of the caption for transformation
-<dest_lang>         : on the fly translation to this language (currently not supported)
+<dest_lang>         : on the fly translation to this language
 <options>           : Destination directory where the output files shall be placed
 
 ```

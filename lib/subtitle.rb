@@ -58,7 +58,7 @@ class Subtitle
     end
     # Translator not required if target_lang is nil
     if @handler.nil?
-      if target_lang.nil?
+      if target_lang.nil? && src_lang.nil?
         @handler = get_caption_handler(options, nil) 
       else
         initialize_handler(options)
@@ -146,9 +146,9 @@ class Subtitle
     when ".vtt"
       handler = VTT.new(caption_file)
     when ".ttml"
-      handler = TTML.new(caption_file)
+      handler = TTML.new(caption_file, options)
     when ".dfxp"
-      handler = DFXP.new(caption_file)
+      handler = DFXP.new(caption_file, options)
     else
       raise "Cannot handle file type .#{extension}"
     end

@@ -5,16 +5,17 @@ require_relative "ttml"
 #
 # Library to handle DFXP Files
 #
-# Uses the translator available to do the necessary language operations
-# as defined by the AllFather
+# Extends the TTML Class as except for namespace differences there isn't
+# much to call between ttml and dfxp
 #
 class DFXP < TTML
 
-	def initialize(cc_file)
+  SUPPORTED_TRANSFORMATIONS = [TYPE_SCC, TYPE_SRT, TYPE_VTT, TYPE_TTML]
+
+	def initialize(cc_file, opts=nil)
     @cc_file = cc_file
-    #@translator = translator
-    #@force_detect = opts[:force_detect] || false
-    raise "Invalid TTML file provided" unless is_valid?
+    @force_detect = opts ? (opts[:force_detect] || false) : false
+    raise "Invalid DFXP file provided" unless is_valid?
   end
 
   def is_valid?
@@ -26,5 +27,12 @@ class DFXP < TTML
     # a well-formed XML. Another is to see if lang is available in each div
     return false
   end
-  
+
+  def callsign
+    TYPE_DFXP
+  end
+
+  def supported_transformations
+    return SUPPORTED_TRANSFORMATIONS
+  end  
 end

@@ -63,16 +63,17 @@ module AllFather
   #
   # * +translator+  - Instance of translation engine. Refer to `engines/aws` for example
   #
+  # ==== Raises
+  # * `InvalidInputException` when the argument `translator` is not an instance of Translator class
+  #
   def set_translator(translator)
     if translator && !(translator.is_a? Translator)
-      raise "Argument is not an instance of Translator"
+      raise InvalidInputException.new("Argument is not an instance of Translator")
     end
   end
 
   #
   # Method to translate the caption from one language to another
-  #
-  # :args: src_lang, target_lang, output_file
   #
   # * +src_lang+        - can be inferred using #infer_language method
   # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
@@ -114,6 +115,9 @@ module AllFather
   # If no target_lang is provided, no translations are applied. output_file is created using
   # without any need for any language translation services. Hence doesn't incur any cost !!
   #
+  # Note: +src_lang+ makes sense only for caption types that can hold multi lingual captions
+  # like dfxp and ttml. For other caption sources this field is ignored
+  #
   # * +types+           - An array of Valid input caption type(s). Refer to `#CaptionType`
   # * +src_lang+        - can be inferred using #infer_language method
   # * +target_lang+     - Target 2 letter ISO language code to which the source needs to be translated in to.
@@ -140,18 +144,31 @@ module AllFather
         raise InvalidInputException.new("SCC can be generated only in en. #{target_lang} is unsupported")
       end
     end
-    if target_lang && !target_lang.empty?
-      raise InvalidInputException.new("Translation to other language as part of transform is yet to be implemented")
-    end
   end
 
   # 
   # Method to report on the supported transformations. Each implementor is free to return
   # the types to which it can convert itself to
   #
-  # Returns an array of one or more types defined as +TYPE_+ constants here 
+  # ==== Returns 
+  # 
+  # * An array of one or more types defined as +TYPE_+ constants here 
   #
   def supported_transformations
     raise "Not Implemented. Class #{self.class.name} doesn't implement supported_transformations"
+  end
+
+  #
+  # While the logic of abstracting stuff to callers has it's benefits, sometimes it's required
+  # to identify which instance are we specifically operate on. This method returns the instance
+  # currently being operated on and returns one of the +TYPE_+ constants defined here
+  # Implement this unless and absolutely it's necessary and there is no other easy way to do things 
+  #
+  # ===== Returns
+  #
+  # * the call sign of the instance
+  #
+  def callsign
+    raise "Not Implemented. Class #{self.class.name} doesn't implement callsign"
   end
 end

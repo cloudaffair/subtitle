@@ -8,7 +8,11 @@ Gem::Specification.new do |spec|
   spec.email         = ["pgmaheshwaran@gmail.com", "arunjeyaprasad@gmail.com"]
 
   spec.summary       = "Subtitle gem helps you to detect language and translate closed caption to required language"
-  spec.description   = "Subtitle gem helps you to detect language and translate closed caption to required language."
+  spec.description   = <<-EOF
+                       Subtitle gem helps you to detect the language(s) of the caption file, translate closed caption 
+                       to another language and also supports transforming from one format to another. 
+                       Say for example from dfxp to srt or vtt or to all supported formats."
+                       EOF
   spec.homepage      = "https://github.com/cloudaffair/subtitle"
   spec.license       = "MIT"
 
