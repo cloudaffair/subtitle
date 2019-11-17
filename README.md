@@ -145,13 +145,36 @@ require 'subtitle'
 
 subtitle = Subtitle.new(caption_file_path)
 
-subtitle.transform(types_to_convert, src_lang, target_lang, options)
+subtitle.transform(types_to_convert, options, target_lang, src_lang)
 
 <types_to_convert>  : An array that can hold any of the following values (dfxp, ttml, srt, vtt, scc)
 <src_lang>          : can be nil or can specify the lang code in case of ttml / dfxp to extract only that section of the caption for transformation
 <dest_lang>         : on the fly translation to this language
 <options>           : Destination directory where the output files shall be placed
 
+```
+
+## Using Subtitle as executable
+
+Subtitle is enabled for executable as well, when installed through gem
+
+```ruby
+get install subtitle
+
+# Help options
+$subtitle -h 
+
+# Detect Language for the given subtitle file
+$subtitle detectlang -k <AWS Key> -s <AWS Secret> -i <CC File Path>
+
+# Translate given subtitle file to French, without mentioning the source language
+$subtitle translate -k <AWS Key> -s <AWS Secret> -i <CC File Path> -d fr -f <out file>
+
+# Translate given subtitle file to French, with mention of source language
+$subtitle translate -k <AWS Key> -s <AWS Secret> -i <CC File Path> -d fr -l en -f <out file>
+ 
+#Transform SRT input file to SCC and VTT
+$subtitle transform -i <CC File Path> -t scc,vtt -f <Out Directory> 
 ```
 
 ## Development 

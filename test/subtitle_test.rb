@@ -4,11 +4,11 @@ require "subtitle"
 
 SUB_COMMANDS = %w(detectlang translate transform)
 global_opts = Optimist::options do
-  banner "Subtitle Utility for lingual detection and translation"
+  banner "Subtitle Utility for lingual detection, translation from one language to another & transform from one format to another"
   opt :access_key_id, "AWS Key", :type => :string, :short => "k"
   opt :secret_access_key, "AWS Secret", :type => :string, :short => "s"
   opt :profile, "AWS Profile", :type => :string, :short => "p"
-  opt :api_key, "Google Translate API Key", :type => :string, :short => "a"
+  #opt :api_key, "Google Translate API Key", :type => :string, :short => "a"
   opt :cc_file, "Closed caption File", :type => :string, :short => "i", :required => true
   opt :dest_lang, "Language code to translate", :type => :string, :short => "d"
   opt :src_lang, "Source language", :type => :string, :short => "l"
@@ -39,7 +39,7 @@ cmd_opts = case cmd
                 types = type_values.split(",")
                 # strip any leading and trailing spaces
                 types = types.map {|x| x.strip}
-                subtitle.transform(types, global_opts[:src_lang], global_opts[:dest_lang], global_opts)
+                subtitle.transform(types, global_opts, global_opts[:dest_lang],  global_opts[:src_lang])
               else
                 Optimist::die "unknown subcommand #{cmd.inspect}"
            end
