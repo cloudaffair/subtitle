@@ -163,6 +163,17 @@ get install subtitle
 
 # Help options
 $subtitle -h 
+Subtitle Utility for lingual detection, translation from one language to another & transform from one format to another
+  -k, --access-key-id=<s>        AWS Key
+  -s, --secret-access-key=<s>    AWS Secret
+  -p, --profile=<s>              AWS Profile
+  -i, --cc-file=<s>              Closed caption File
+  -d, --dest-lang=<s>            Language code to translate
+  -l, --src-lang=<s>             Source language
+  -f, --outfile=<s>              Destination file / directory
+  -w, --force-detect             Will try to infer the language even if language is provided. By default false if not provided
+  -t, --types=<s>                comma seperated lowercase formats to convert to. valid values are srt, scc, vtt, ttml and dfxp
+  -h, --help                     Show this message
 
 # Detect Language for the given subtitle file
 $subtitle detectlang -k <AWS Key> -s <AWS Secret> -i <CC File Path>
