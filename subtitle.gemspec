@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   #spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
   spec.require_paths = ['lib']
   spec.files = Dir['lib/*.rb','lib/engines/*.rb','lib/utils/*.rb']
+  spec.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
   spec.add_development_dependency "bundler", "~> 2.0"
   #spec.add_runtime_dependency "aws-sdk-comprehend", "=1.25.0"

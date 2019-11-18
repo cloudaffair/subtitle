@@ -41,7 +41,7 @@ class Subtitle
     outfile
   end
 
-  def transform(types, src_lang = nil, target_lang = nil, options = nil)
+  def transform(types, options = nil, target_lang = nil, src_lang = nil)
     # A quick validation & translation to expected arguments
     vals = []
     invalid_vals = []

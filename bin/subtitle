@@ -1,6 +1,7 @@
-require "optimist"
-require "subtitle"
+#!/usr/bin/env ruby
 
+require 'subtitle'
+require 'optimist'
 
 SUB_COMMANDS = %w(detectlang translate transform)
 global_opts = Optimist::options do
@@ -39,7 +40,7 @@ cmd_opts = case cmd
                 types = type_values.split(",")
                 # strip any leading and trailing spaces
                 types = types.map {|x| x.strip}
-                subtitle.transform(types, global_opts, global_opts[:dest_lang],  global_opts[:src_lang])
+                subtitle.transform(types, global_opts, global_opts[:dest_lang], global_opts[:src_lang] )
               else
                 Optimist::die "unknown subcommand #{cmd.inspect}"
            end
