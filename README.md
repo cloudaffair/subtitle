@@ -157,7 +157,6 @@ subtitle.transform(types_to_convert, options, target_lang, src_lang)
 ## Using Subtitle as executable
 
 Subtitle is enabled for executable as well, when installed through gem
-<<<<<<< HEAD
 
 ```ruby
 get install subtitle
@@ -191,39 +190,6 @@ $subtitle transform -i <CC File Path> -t scc,vtt -f <Out Directory>
 In case you business case needs translate and then transform, you can use translate and followed by transform
 ```
 
-=======
-
-```ruby
-get install subtitle
-
-# Help options
-$subtitle -h 
-Subtitle Utility for lingual detection, translation from one language to another & transform from one format to another
-  -k, --access-key-id=<s>        AWS Key
-  -s, --secret-access-key=<s>    AWS Secret
-  -p, --profile=<s>              AWS Profile
-  -i, --cc-file=<s>              Closed caption File
-  -d, --dest-lang=<s>            Language code to translate
-  -l, --src-lang=<s>             Source language
-  -f, --outfile=<s>              Destination file / directory
-  -w, --force-detect             Will try to infer the language even if language is provided. By default false if not provided
-  -t, --types=<s>                comma seperated lowercase formats to convert to. valid values are srt, scc, vtt, ttml and dfxp
-  -h, --help                     Show this message
-
-# Detect Language for the given subtitle file
-$subtitle detectlang -k <AWS Key> -s <AWS Secret> -i <CC File Path>
-
-# Translate given subtitle file to French, without mentioning the source language
-$subtitle translate -k <AWS Key> -s <AWS Secret> -i <CC File Path> -d fr -f <out file>
-
-# Translate given subtitle file to French, with mention of source language
-$subtitle translate -k <AWS Key> -s <AWS Secret> -i <CC File Path> -d fr -l en -f <out file>
- 
-#Transform SRT input file to SCC and VTT
-$subtitle transform -i <CC File Path> -t scc,vtt -f <Out Directory> 
-```
-
->>>>>>> fc2fdfb808a955b1d1d01f7472086ccb11af36bb
 ## Development 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
