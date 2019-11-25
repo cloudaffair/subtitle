@@ -186,6 +186,8 @@ $subtitle translate -k <AWS Key> -s <AWS Secret> -i <CC File Path> -d fr -l en -
  
 #Transform SRT input file to SCC and VTT
 $subtitle transform -i <CC File Path> -t scc,vtt -f <Out Directory> 
+
+In case you business case needs translate and then transform, you can use translate and followed by transform
 ```
 
 ## Development 
