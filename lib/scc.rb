@@ -42,7 +42,7 @@ class SCC
     rescue StandardError => e
       puts "Error while detecting the language due to #{e.message}"
     end
-    lang
+    [lang]
   end
 
   def translate(src_lang, dest_lang, out_file)
