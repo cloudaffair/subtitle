@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   #spec.add_runtime_dependency "aws-sdk-translate", "=1.17.0"
   spec.add_runtime_dependency "nokogiri", "=1.10.4"
   spec.add_development_dependency "aws-sdk", "~> 2.11"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "optimist"
 end
