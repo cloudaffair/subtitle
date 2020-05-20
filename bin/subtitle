@@ -16,6 +16,8 @@ global_opts = Optimist::options do
   opt :outfile, "Destination file / directory", :type => :string, :short => "f"
   opt :force_detect, "Will try to infer the language even if language is provided. By default false if not provided", :type => :boolean, :short => "w", :default => false
   opt :types, "comma seperated lowercase formats to convert to. valid values are srt, scc, vtt, ttml and dfxp", :type=>:string, :short => "t"
+  opt :bucket, "s3 bucket is needed to store output of transcribe", :type=>:string, :short => "b"
+  opt :audio_lang, "audio lang of the video file", :tyep=>:string, :short => "a"
 end
 Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc_file]) if global_opts[:cc_file]
 cmd = ARGV.shift # get the subcommand
@@ -41,6 +43,20 @@ cmd_opts = case cmd
                 # strip any leading and trailing spaces
                 types = types.map {|x| x.strip}
                 subtitle.transform(types, global_opts, global_opts[:dest_lang], global_opts[:src_lang] )
+              when "generatesrt"
+                if global_opts[:outfile].nil?
+                  puts "Need to provide destination filename using option[-f]"
+                  exit 1
+                end
+                subtitle = Subtitle.new(global_opts[:cc_file])
+                subtitle.generate_srt(global_opts[:outfile])
+              when "transcribe"
+                if global_opts[:outfile].nil? || global_opts[:bucket].nil? || global_opts[:audio_lang].nil?
+                  puts "Need to provide destination filename using option[-f], bucket name using option[-b] and audio lang using option[-a]"
+                  exit 1
+                end
+                subtitle = Subtitle.new(global_opts[:cc_file], global_opts)
+                subtitle.transcribe
               else
                 Optimist::die "unknown subcommand #{cmd.inspect}"
            end

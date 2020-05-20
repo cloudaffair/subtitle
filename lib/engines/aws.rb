@@ -64,6 +64,8 @@ class AwsEngine
     end
     @translate_service  = Aws::Translate::Client.new(region: @region)
     @comprehend_service = Aws::Comprehend::Client.new(region: @region)
+    @transcribe_service = Aws::TranscribeService::Client.new(region: @region)
+    @s3 = Aws::S3::Resource.new
   end
 
   # 
@@ -91,6 +93,67 @@ class AwsEngine
     response = @translate_service.translate_text({ :text => "#{input_text}" , 
       :source_language_code => "#{src_lang}", :target_language_code => "#{target_lang}"})
     response.translated_text
+  end
+
+  def transcribe_uri(video_uri, lang_code, bucket_name)
+    # output name of the transcribe file will be based on the Job name
+    # So better create our own job name
+    # They have to give the bucket name. Since we dont have access to their buckets
+    # Both input and output files
+
+
+    current_time = Time.now.strftime("%Y-%m-%d-%H:%M:%S")
+    job_name = "transcribe-#{current_time}"
+
+    #So output filename will be job_name.json
+    resp = @transcribe_service.start_transcription_job({
+        transcription_job_name: job_name,
+        language_code: lang_code,
+        media: {
+            media_file_uri: video_uri
+        },
+        output_bucket_name: bucket_name
+    })
+
+    # We need to poll to check whether the transcribe is completed
+    # It takes 2x to 3x time for the transcribe to complete
+    complete = false
+    while complete == false do 
+        status = resp.transcription_job.transcription_job_status
+        if (status.eql?("COMPLETED") || status.eql?("FAILED"))
+            complete == true
+        else
+          # This can be changed based on the asset duration
+          sleep(5)
+        end
+    end
+
+    
+    output_json_obj = @s3.bucket(bucket_name).object("#{job_name}.json")
+    temp_json_output = "temp-#{job_name}.json"
+
+    File.open(temp_json_output, 'wb') do |file|
+      output_json_obj.read do |chunk|
+        file.write(chunk)
+      end
+    end
+
+    # The JSON output generated from Transcribe is copied to the temp folder
+    # Pass this file to srthelper
+    temp_json_output
+
+  end
+
+  def transcribe_file(file, lang_code, bucket_name)
+
+    current_time = Time.now.strftime("%Y-%m-%d-%H:%M:%S")
+    input_file_name = "tempfile-#{current_time}"
+    obj = @s3.bucket(bucket_name).object(input_file_name)
+    obj.upload_file(file, acl:'public-read')
+    # Need to check whether we need to do polling to check file transfer is completed.
+
+    temp_json_output = transcribe_uri(obj.public_url, lang_code, bucket_name)
+    temp_json_output
   end
 end
 

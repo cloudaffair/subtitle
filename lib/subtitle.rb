@@ -3,9 +3,12 @@ require_relative "vtt"
 require_relative "scc"
 require_relative "ttml"
 require_relative "dfxp"
+require_relative "srthelper"
 require_relative "allfather"
 require_relative "engines/translator"
 require_relative "engines/aws"
+require "uri"
+
 
 #
 # Facade that wraps all the complexities surrounding which translation
@@ -15,6 +18,8 @@ class Subtitle
 
   TYPE_MAP = {"scc" => AllFather::TYPE_SCC, "srt" => AllFather::TYPE_SRT, "vtt" => AllFather::TYPE_VTT, 
               "ttml" => AllFather::TYPE_TTML, "dfxp" => AllFather::TYPE_DFXP}
+  ENCODE_UNSAFE = ['"','<','>','{','}','|','\\','^','~','[',']','`',' ','#']
+  ENCODE_RESERVED = [';','$','?','@','=',':','/','&','+',',']
 
   def initialize(file, options = nil)
     # Infer the caption handler from the extension
@@ -66,6 +71,57 @@ class Subtitle
     end
     output_dir = options[:outfile]
     @handler.transform_to(vals, src_lang, target_lang, output_dir)
+  end
+
+  def generate_srt(outfile)
+    srt_helper = SrtHelper.new
+    srt_helper.parse_file(@cc_file, outfile)
+  end
+
+  def transcribe()
+    # From here call the "aws.rb"
+    # Get the transcribe output json file 
+    # Pass it to the generate_srt
+
+    aws = AwsEngine.new(options)
+    outfile = options[:outfile]
+    bucket = options[:bucket]
+    audio_lang = options[:audio_lang]
+    transcribe_json_file = nil
+    if(isURL?(@cc_file))
+      transcribe_json_file = aws.transcribe_uri(@cc, audio_lang, bucket)
+    else
+      transcribe_json_file = aws.transcribe_file(@cc, audio_lang, bucket)
+    end
+    srt_helper = SrtHelper.new
+    srt_helper.parse_file(transcribe_json_file, outfile)
+  end
+
+  def isURL?(url_string)
+    begin
+      url = parseURI(url_string) rescue nil
+      case (url.scheme rescue nil)
+      when "http", "https", "ftp"
+        if url.host.nil?
+          return false
+        else
+          return true
+        end
+      end
+    rescue StandardError => e
+      @log.warn{"Error parsing URI (#{url_string}). Error: #{e}"}
+    end
+    return false
+  end
+
+  def parseURI(uri_string)
+    encoded_uri = URI.encode(URI.decode(uri_string)) #decode first in case uri is already partially encoded
+    safe_uri = URI.encode(encoded_uri, ENCODE_UNSAFE.join)
+    uri = URI.parse(safe_uri)
+    #This is probably not a remote uri if there is no scheme. Should be a local file
+    #URI encode reserved characters to ensure that the filename is not modified of during parsing
+    uri = URI.parse(URI.encode(safe_uri, ENCODE_RESERVED.join)) if !uri.scheme 
+    uri
   end
 
   def type
