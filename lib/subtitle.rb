@@ -78,7 +78,7 @@ class Subtitle
     srt_helper.parse_file(@cc_file, outfile)
   end
 
-  def transcribe()
+  def transcribe(options)
     # From here call the "aws.rb"
     # Get the transcribe output json file 
     # Pass it to the generate_srt
@@ -87,14 +87,23 @@ class Subtitle
     outfile = options[:outfile]
     bucket = options[:bucket]
     audio_lang = options[:audio_lang]
+    video_file = options[:video_file]
     transcribe_json_file = nil
-    if(isURL?(@cc_file))
-      transcribe_json_file = aws.transcribe_uri(@cc, audio_lang, bucket)
+    isurl = isURL?(video_file)
+    if(isurl == true)
+      output = aws.transcribe_uri(video_file, audio_lang, bucket)
     else
-      transcribe_json_file = aws.transcribe_file(@cc, audio_lang, bucket)
+      output = aws.transcribe_file(video_file, audio_lang, bucket)
     end
+    if output["status"].eql?("FAILED")
+      failure_reason = output["failure_reason"]
+      #return "AWS Transcribe failed #{failure_reason}"
+    end
+    transcribe_json_file = output["temp_json_output"]
     srt_helper = SrtHelper.new
     srt_helper.parse_file(transcribe_json_file, outfile)
+    File.delete(transcribe_json_file) if File.exist?(transcribe_json_file)
+    aws.delete_temp_transcribe_file(bucket, output)
   end
 
   def isURL?(url_string)
@@ -109,7 +118,7 @@ class Subtitle
         end
       end
     rescue StandardError => e
-      @log.warn{"Error parsing URI (#{url_string}). Error: #{e}"}
+      puts "Error parsing URI (#{url_string}). Error: #{e}"
     end
     return false
   end
@@ -205,10 +214,12 @@ class Subtitle
       handler = TTML.new(caption_file, options)
     when ".dfxp"
       handler = DFXP.new(caption_file, options)
+    when ".json"
+      handler = nil
     else
       raise "Cannot handle file type .#{extension}"
     end
-    handler.set_translator(translator)
+    handler.set_translator(translator) if handler
     handler
   end
 end

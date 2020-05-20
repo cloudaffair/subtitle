@@ -102,7 +102,7 @@ class AwsEngine
     # Both input and output files
 
 
-    current_time = Time.now.strftime("%Y-%m-%d-%H:%M:%S")
+    current_time = Time.now.strftime("%Y-%m-%d-%H-%M-%S")
     job_name = "transcribe-#{current_time}"
 
     #So output filename will be job_name.json
@@ -119,41 +119,62 @@ class AwsEngine
     # It takes 2x to 3x time for the transcribe to complete
     complete = false
     while complete == false do 
+        resp = @transcribe_service.get_transcription_job({transcription_job_name: job_name})
         status = resp.transcription_job.transcription_job_status
         if (status.eql?("COMPLETED") || status.eql?("FAILED"))
-            complete == true
+            complete = true
         else
           # This can be changed based on the asset duration
           sleep(5)
         end
     end
 
+    output = {"status" => status}
+    if status.eql?("FAILED")
+      output["failure_reason"] = resp.transcription_job.failure_reason
+      return output
+    end
+    output["s3_temp_json_output"] = "#{job_name}.json"
     
     output_json_obj = @s3.bucket(bucket_name).object("#{job_name}.json")
     temp_json_output = "temp-#{job_name}.json"
 
-    File.open(temp_json_output, 'wb') do |file|
-      output_json_obj.read do |chunk|
-        file.write(chunk)
-      end
-    end
+    output_json_obj.download_file(temp_json_output)
 
     # The JSON output generated from Transcribe is copied to the temp folder
     # Pass this file to srthelper
-    temp_json_output
+    output["temp_json_output"] = temp_json_output
+    output
 
   end
 
   def transcribe_file(file, lang_code, bucket_name)
 
-    current_time = Time.now.strftime("%Y-%m-%d-%H:%M:%S")
+    current_time = Time.now.strftime("%Y-%m-%d-%H-%M-%S")
     input_file_name = "tempfile-#{current_time}"
     obj = @s3.bucket(bucket_name).object(input_file_name)
     obj.upload_file(file, acl:'public-read')
-    # Need to check whether we need to do polling to check file transfer is completed.
 
-    temp_json_output = transcribe_uri(obj.public_url, lang_code, bucket_name)
-    temp_json_output
+    output = transcribe_uri(obj.public_url, lang_code, bucket_name)
+    output["input_file_name"] = input_file_name
+    output
   end
+
+  def delete_temp_transcribe_file(bucket_name, output)
+    transcribe_file_output = output["s3_temp_json_output"]
+    video_input_file_name = output["input_file_name"]
+
+    if transcribe_file_output
+      obj = @s3.bucket(bucket_name).object(transcribe_file_output)
+      obj.delete
+    end
+
+    if video_input_file_name
+      obj = @s3.bucket(bucket_name).object(video_input_file_name)
+      obj.delete
+    end
+
+  end
+
 end
 
