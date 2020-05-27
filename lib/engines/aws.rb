@@ -142,7 +142,7 @@ class AwsEngine
     output_json_obj.download_file(temp_json_output)
 
     # The JSON output generated from Transcribe is copied to the temp folder
-    # Pass this file to srthelper
+    # Pass this file to transcribehelper
     output["temp_json_output"] = temp_json_output
     output
 
@@ -164,16 +164,12 @@ class AwsEngine
     transcribe_file_output = output["s3_temp_json_output"]
     video_input_file_name = output["input_file_name"]
 
-    if transcribe_file_output
-      obj = @s3.bucket(bucket_name).object(transcribe_file_output)
-      obj.delete
+    [transcribe_file_output, video_input_file_name].each do |key|
+      if key
+        obj = @s3.bucket(bucket_name).object(key)
+        obj.delete
+      end
     end
-
-    if video_input_file_name
-      obj = @s3.bucket(bucket_name).object(video_input_file_name)
-      obj.delete
-    end
-
   end
 
 end

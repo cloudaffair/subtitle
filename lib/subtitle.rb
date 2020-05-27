@@ -3,7 +3,7 @@ require_relative "vtt"
 require_relative "scc"
 require_relative "ttml"
 require_relative "dfxp"
-require_relative "srthelper"
+require_relative "transcribehelper"
 require_relative "allfather"
 require_relative "engines/translator"
 require_relative "engines/aws"
@@ -74,7 +74,7 @@ class Subtitle
   end
 
   def generate_srt(outfile)
-    srt_helper = SrtHelper.new
+    srt_helper = TranscribeHelper.new
     srt_helper.parse_file(@cc_file, outfile)
   end
 
@@ -98,9 +98,10 @@ class Subtitle
     if output["status"].eql?("FAILED")
       failure_reason = output["failure_reason"]
       #return "AWS Transcribe failed #{failure_reason}"
+      raise StandardError.new(failure_reason)
     end
     transcribe_json_file = output["temp_json_output"]
-    srt_helper = SrtHelper.new
+    srt_helper = TranscribeHelper.new
     srt_helper.parse_file(transcribe_json_file, outfile)
     File.delete(transcribe_json_file) if File.exist?(transcribe_json_file)
     aws.delete_temp_transcribe_file(bucket, output)
