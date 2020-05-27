@@ -64,6 +64,8 @@ class AwsEngine
     end
     @translate_service  = Aws::Translate::Client.new(region: @region)
     @comprehend_service = Aws::Comprehend::Client.new(region: @region)
+    @transcribe_service = Aws::TranscribeService::Client.new(region: @region)
+    @s3 = Aws::S3::Resource.new
   end
 
   # 
@@ -92,5 +94,83 @@ class AwsEngine
       :source_language_code => "#{src_lang}", :target_language_code => "#{target_lang}"})
     response.translated_text
   end
+
+  def transcribe_uri(video_uri, lang_code, bucket_name)
+    # output name of the transcribe file will be based on the Job name
+    # So better create our own job name
+    # They have to give the bucket name. Since we dont have access to their buckets
+    # Both input and output files
+
+
+    current_time = Time.now.strftime("%Y-%m-%d-%H-%M-%S")
+    job_name = "transcribe-#{current_time}"
+
+    #So output filename will be job_name.json
+    resp = @transcribe_service.start_transcription_job({
+        transcription_job_name: job_name,
+        language_code: lang_code,
+        media: {
+            media_file_uri: video_uri
+        },
+        output_bucket_name: bucket_name
+    })
+
+    # We need to poll to check whether the transcribe is completed
+    # It takes 2x to 3x time for the transcribe to complete
+    complete = false
+    while complete == false do 
+        resp = @transcribe_service.get_transcription_job({transcription_job_name: job_name})
+        status = resp.transcription_job.transcription_job_status
+        if (status.eql?("COMPLETED") || status.eql?("FAILED"))
+            complete = true
+        else
+          # This can be changed based on the asset duration
+          sleep(5)
+        end
+    end
+
+    output = {"status" => status}
+    if status.eql?("FAILED")
+      output["failure_reason"] = resp.transcription_job.failure_reason
+      return output
+    end
+    output["s3_temp_json_output"] = "#{job_name}.json"
+    
+    output_json_obj = @s3.bucket(bucket_name).object("#{job_name}.json")
+    temp_json_output = "temp-#{job_name}.json"
+
+    output_json_obj.download_file(temp_json_output)
+
+    # The JSON output generated from Transcribe is copied to the temp folder
+    # Pass this file to transcribehelper
+    output["temp_json_output"] = temp_json_output
+    output
+
+  end
+
+  def transcribe_file(file, lang_code, bucket_name)
+
+    current_time = Time.now.strftime("%Y-%m-%d-%H-%M-%S")
+    input_file_name = "tempfile-#{current_time}"
+    obj = @s3.bucket(bucket_name).object(input_file_name)
+    obj.upload_file(file, acl:'public-read')
+
+    output = transcribe_uri(obj.public_url, lang_code, bucket_name)
+    output["input_file_name"] = input_file_name
+    output
+  end
+
+  def delete_temp_transcribe_file(bucket_name, output)
+    transcribe_file_output = output["s3_temp_json_output"]
+    video_input_file_name = output["input_file_name"]
+
+    [transcribe_file_output, video_input_file_name].each do |key|
+      if key
+        obj = @s3.bucket(bucket_name).object(key)
+        obj.delete
+      end
+    end
+  end
+
 end
 

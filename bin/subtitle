@@ -9,13 +9,17 @@ global_opts = Optimist::options do
   opt :access_key_id, "AWS Key", :type => :string, :short => "k"
   opt :secret_access_key, "AWS Secret", :type => :string, :short => "s"
   opt :profile, "AWS Profile", :type => :string, :short => "p"
+  opt :region, "AWS region", :type => :string, :short => "r"
   #opt :api_key, "Google Translate API Key", :type => :string, :short => "a"
-  opt :cc_file, "Closed caption File", :type => :string, :short => "i", :required => true
+  opt :cc_file, "Closed caption File", :type => :string, :short => "i"
   opt :dest_lang, "Language code to translate", :type => :string, :short => "d"
   opt :src_lang, "Source language", :type => :string, :short => "l"
   opt :outfile, "Destination file / directory", :type => :string, :short => "f"
   opt :force_detect, "Will try to infer the language even if language is provided. By default false if not provided", :type => :boolean, :short => "w", :default => false
   opt :types, "comma seperated lowercase formats to convert to. valid values are srt, scc, vtt, ttml and dfxp", :type=>:string, :short => "t"
+  opt :bucket, "s3 bucket is needed to store output of transcribe", :type=>:string, :short => "b"
+  opt :audio_lang, "s3 bucket is needed to store output of transcribe", :type=>:string, :short => "a"
+  opt :video_file, "s3 bucket is needed to store output of transcribe", :type=>:string, :short => "v"
 end
 Optimist::die :cc_file, "File Does not Exist" unless File.exist?(global_opts[:cc_file]) if global_opts[:cc_file]
 cmd = ARGV.shift # get the subcommand
@@ -41,6 +45,21 @@ cmd_opts = case cmd
                 # strip any leading and trailing spaces
                 types = types.map {|x| x.strip}
                 subtitle.transform(types, global_opts, global_opts[:dest_lang], global_opts[:src_lang] )
+              when "generatesrt"
+                if global_opts[:outfile].nil?
+                  puts "Need to provide destination filename using option[-f]"
+                  exit 1
+                end
+                subtitle = Subtitle.new(global_opts[:cc_file])
+                subtitle.generate_srt(global_opts[:outfile])
+              when "transcribe"
+                if global_opts[:outfile].nil? || global_opts[:bucket].nil? || global_opts[:audio_lang].nil?
+                  puts "Need to provide destination filename using option[-f], bucket name using option[-b] and audio lang using option[-a]"
+                  exit 1
+                end
+                global_opts[:cc_file] = "temp.json"
+                subtitle = Subtitle.new(global_opts[:cc_file], global_opts)
+                subtitle.transcribe(global_opts)
               else
                 Optimist::die "unknown subcommand #{cmd.inspect}"
            end

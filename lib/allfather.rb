@@ -13,7 +13,7 @@ module AllFather
   # 
   # Valid file extensions that we support; Keep expanding as we grow
   #
-  VALID_FILES = [".scc", ".srt", ".vtt", ".ttml", ".dfxp"]
+  VALID_FILES = [".scc", ".srt", ".vtt", ".ttml", ".dfxp", ".json" , ".mp4"]
 
   #
   # Caption type constants
