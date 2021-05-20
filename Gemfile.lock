@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     subtitle (0.3.3)
-      nokogiri (= 1.10.4)
+      nokogiri (= 1.11.5)
 
 GEM
   remote: https://rubygems.org/
@@ -18,11 +18,13 @@ GEM
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
     jmespath (1.4.0)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.5.1)
     minitest (5.13.0)
-    nokogiri (1.10.4)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.11.5)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
     optimist (3.0.0)
+    racc (1.5.2)
     rake (10.5.0)
 
 PLATFORMS
