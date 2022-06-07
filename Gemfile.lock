@@ -17,7 +17,7 @@ GEM
       aws-sdk-core (= 2.11.386)
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     mini_portile2 (2.4.0)
     minitest (5.13.0)
     nokogiri (1.10.4)
